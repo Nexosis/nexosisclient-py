@@ -1,12 +1,12 @@
 import json
 import os
-from datetime import datetime, date
 
 import requests
 
 from .sessions import Sessions
 from .imports import Imports
 from .datasets import Datasets
+from .http_client import HttpClient
 
 from nexosisapi import NEXOSIS_API_KEY
 
@@ -19,25 +19,10 @@ class Client(object):
             uri = uri[:-1]
         self._uri = uri
 
-        self._datasets = Datasets()
-        self._imports = Imports()
-        self._sessions = Sessions()
-
-    @staticmethod
-    def _json_serial(obj):
-        """JSON serializer for datetime since it is not serializable by default json code"""
-        if isinstance(obj, (datetime, date)):
-            serial = obj.isoformat()
-            return serial
-        raise TypeError("Type %s not serializable" % type(obj))
-
-    def _generate_headers(self):
-        return {
-            'api-key': self._key,
-            'User-Agent': 'Nexosis-Python-API-Client/1.0',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+        self._client = HttpClient()
+        self._datasets = Datasets(self._client)
+        self._imports = Imports(self._client)
+        self._sessions = Sessions(self._client)
 
     @property
     def datasets(self):
@@ -51,25 +36,10 @@ class Client(object):
     def sessions(self):
         return self._sessions
 
-    def _create_session(self, data, action_type, dataset_name, target_column, event_name,
-                           start_date, end_date, column_metadata={}, callback_url=None):
-        resp = requests.post('%s/sessions/%s' % (self._uri, action_type),
-                             params={
-                                 'dataSetName': dataset_name,
-                                 'targetColumn': target_column,
-                                 'eventName': event_name,
-                                 'startDate': start_date,
-                                 'endDate': end_date,
-                                 'callbackUrl': callback_url},
-                             data=json.dumps(data, default=Client._json_serial),
-                             headers=self._generate_headers())
-
-        return resp.json(), resp.status_code, resp.headers
-
     def get_account_balance(self):
         """get_account_balance"""
         balance_url = self._uri + "/data"
-        response = requests.get(balance_url, headers=self._generate_headers())
+        response = self._client.get(balance_url)
         if response.status_code == 200:
             header = response.headers['nexosis-account-balance']
             if header is not None:
@@ -78,19 +48,9 @@ class Client(object):
 
         response.raise_for_status()
 
-    def create_forecast(self, data, target_column, start_date, end_date, callback_url=None):
-        """create_forecast"""
-        return self._create_session(
-            data, 'forecast', None, target_column, None, start_date, end_date, callback_url)
-
-    def analyze_impact(self, data, target_column, event_name, start_date, end_date, callback_url=None):
-        """analyze_impact"""
-        return self._create_session(
-            data, 'impact', None, target_column, event_name, start_date, end_date, callback_url)
-
     def get_status(self, session_id):
         """get_status"""
-        resp = requests.head('%s/sessions/%s' % (self._uri, session_id), headers=self._generate_headers())
+        resp = self._client.head('%s/sessions/%s' % (self._uri, session_id), headers=self._generate_headers())
         return None, resp.status_code, resp.headers
 
     def get_results(self, session_id):
