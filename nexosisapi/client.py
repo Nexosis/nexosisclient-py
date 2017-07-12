@@ -3,10 +3,9 @@ import os
 from datetime import datetime, date
 import requests
 
+from . import NEXOSIS_API_KEY
 
-class NexosisClient:
-    NEXOSIS_API_KEY = 'NEXOSIS_API_KEY'
-    SESSION_STATUS_HEADER = 'Nexosis-Session-Status'
+class Client:
 
     def __init__(self, key=os.environ[NEXOSIS_API_KEY], uri='https://ml.nexosis.com/v1'):
         self.key = key
@@ -40,7 +39,7 @@ class NexosisClient:
                                  'startDate': start_date,
                                  'endDate': end_date,
                                  'callbackUrl': callback_url},
-                             data=json.dumps(data, default=NexosisClient._json_serial),
+                             data=json.dumps(data, default=Client._json_serial),
                              headers=self._generate_headers())
 
         return resp.json(), resp.status_code, resp.headers

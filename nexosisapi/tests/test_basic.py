@@ -1,19 +1,19 @@
 import os
 import unittest
 
-from nexosisclient import nexosisclient, Dataset
+import nexosisapi
 
 
 class BasicTests(unittest.TestCase):
     def setUp(self):
-        self.test_client = nexosisclient.NexosisClient(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
+        self.test_client = nexosisapi.Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
 
     def test_can_create_client_with_env_key(self):
-        target = nexosisclient.NexosisClient()
+        target = nexosisapi.Client()
         self.assertIsNotNone(target.key)
 
     def test_can_override_client_base_uri(self):
-        target = nexosisclient.NexosisClient(uri='https://api.uat.nexosisdev.com/v1')
+        target = nexosisapi.Client(uri='https://api.uat.nexosisdev.com/v1')
         self.assertEqual(target.uri, "https://api.uat.nexosisdev.com/v1")
 
     def test_api_returns_current_balance(self):
@@ -32,7 +32,7 @@ class DataSetIntegrationTests(unittest.TestCase):
         pass
 
     def test_dataset_creation(self):
-        it = Dataset({'data': [{'key': 1, 'value': 'test'}]})
+        it = nexosisapi.Dataset({'data': [{'key': 1, 'value': 'test'}]})
         self.assertIsNotNone(it.data)
 
 if __name__ == '__main__':
