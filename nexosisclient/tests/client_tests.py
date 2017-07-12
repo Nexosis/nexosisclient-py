@@ -1,12 +1,12 @@
-import unittest
-import nexosisclient
 import os
+import unittest
+
+from nexosisclient import nexosisclient, Dataset
 
 
 class BasicTests(unittest.TestCase):
     def setUp(self):
-        self.test_client = nexosisclient.NexosisClient(key=os.environ["NEXOSIS_API_TESTKEY"],
-                                                       uri=os.environ["NEXOSIS_API_TESTURI"])
+        self.test_client = nexosisclient.NexosisClient(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
 
     def test_can_create_client_with_env_key(self):
         target = nexosisclient.NexosisClient()
@@ -31,6 +31,9 @@ class DataSetIntegrationTests(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_dataset_creation(self):
+        it = Dataset({'data': [{'key': 1, 'value': 'test'}]})
+        self.assertIsNotNone(it.data)
 
 if __name__ == '__main__':
     unittest.main()
