@@ -10,30 +10,13 @@ class BasicTests(unittest.TestCase):
 
     def test_can_create_client_with_env_key(self):
         target = nexosisapi.Client()
-        self.assertIsNotNone(target.key)
+        self.assertIsNotNone(target._key)
 
     def test_can_override_client_base_uri(self):
-        target = nexosisapi.Client(uri='https://api.uat.nexosisdev.com/v1')
-        self.assertEqual(target.uri, "https://api.uat.nexosisdev.com/v1")
+        target = nexosisapi.Client(uri='https://something.example.com/v1')
+        self.assertEqual(target._uri, "https://something.example.com/v1")
 
     def test_api_returns_current_balance(self):
         actual = self.test_client.get_account_balance()
         self.assertIsNotNone(actual)
         self.assertTrue(actual > 0)
-
-
-class SessionIntegrationTests(unittest.TestCase):
-    def setUp(self):
-        pass
-
-
-class DataSetIntegrationTests(unittest.TestCase):
-    def setUp(self):
-        pass
-
-    def test_dataset_creation(self):
-        it = nexosisapi.Dataset({'data': [{'key': 1, 'value': 'test'}]})
-        self.assertIsNotNone(it.data)
-
-if __name__ == '__main__':
-    unittest.main()

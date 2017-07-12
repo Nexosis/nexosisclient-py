@@ -3,4 +3,4 @@ SESSION_STATUS_HEADER = 'Nexosis-Session-Status'
 
 from .dataset import Dataset
 from .column_metadata import ColumnMetadata
-from .client import Client
+from .client.client import Client

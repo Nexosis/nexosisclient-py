@@ -1,17 +1,27 @@
 import json
 import os
 from datetime import datetime, date
+
 import requests
 
-from . import NEXOSIS_API_KEY
+from .sessions import Sessions
+from .imports import Imports
+from .datasets import Datasets
 
-class Client:
+from nexosisapi import NEXOSIS_API_KEY
+
+
+class Client(object):
 
     def __init__(self, key=os.environ[NEXOSIS_API_KEY], uri='https://ml.nexosis.com/v1'):
-        self.key = key
+        self._key = key
         if uri.endswith('/'):
             uri = uri[:-1]
-        self.uri = uri
+        self._uri = uri
+
+        self._datasets = Datasets()
+        self._imports = Imports()
+        self._sessions = Sessions()
 
     @staticmethod
     def _json_serial(obj):
@@ -23,15 +33,27 @@ class Client:
 
     def _generate_headers(self):
         return {
-            'api-key': self.key,
+            'api-key': self._key,
             'User-Agent': 'Nexosis-Python-API-Client/1.0',
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
 
+    @property
+    def datasets(self):
+        return self._datasets
+
+    @property
+    def imports(self):
+        return self._imports
+
+    @property
+    def sessions(self):
+        return self._sessions
+
     def _create_session(self, data, action_type, dataset_name, target_column, event_name,
                            start_date, end_date, column_metadata={}, callback_url=None):
-        resp = requests.post('%s/sessions/%s' % (self.uri, action_type),
+        resp = requests.post('%s/sessions/%s' % (self._uri, action_type),
                              params={
                                  'dataSetName': dataset_name,
                                  'targetColumn': target_column,
@@ -46,7 +68,7 @@ class Client:
 
     def get_account_balance(self):
         """get_account_balance"""
-        balance_url = self.uri + "/data"
+        balance_url = self._uri + "/data"
         response = requests.get(balance_url, headers=self._generate_headers())
         if response.status_code == 200:
             header = response.headers['nexosis-account-balance']
@@ -68,10 +90,10 @@ class Client:
 
     def get_status(self, session_id):
         """get_status"""
-        resp = requests.head('%s/sessions/%s' % (self.uri, session_id), headers=self._generate_headers())
+        resp = requests.head('%s/sessions/%s' % (self._uri, session_id), headers=self._generate_headers())
         return None, resp.status_code, resp.headers
 
     def get_results(self, session_id):
         """get_results"""
-        resp = requests.get('%s/sessions/%s/results' % (self.uri, session_id), headers=self._generate_headers())
+        resp = requests.get('%s/sessions/%s/results' % (self._uri, session_id), headers=self._generate_headers())
         return resp.json(), resp.status_code, resp.headers

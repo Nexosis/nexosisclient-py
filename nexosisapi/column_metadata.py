@@ -1,14 +1,14 @@
 from enum import Enum
 
 
-class ColumnType(object):
+class ColumnType(Enum):
     string = 0,
     numeric = 1,
     logical = 2,
     date = 3
 
 
-class ColumnRole(object):
+class ColumnRole(Enum):
     none = 0,
     timestamp = 1,
     target = 2,

@@ -1,0 +1,2 @@
+class Sessions(object):
+    pass
