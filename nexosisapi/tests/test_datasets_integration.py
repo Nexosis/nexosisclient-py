@@ -10,4 +10,4 @@ class DatasetsIntegrationTests(unittest.TestCase):
                                              uri=os.environ["NEXOSIS_API_TESTURI"])
 
     def test_something(self):
-        self.test_client.datasets.create_json()
+        pass

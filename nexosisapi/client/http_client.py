@@ -2,6 +2,8 @@ from datetime import datetime, date
 import json
 import requests
 
+from .client_error import ClientError
+
 
 class HttpClient(object):
     def __init__(self, key, uri):
@@ -47,4 +49,9 @@ class HttpClient(object):
 
     # should be a better way to do this?
     def request(self, verb, uri_path, **kwargs):
-        return requests.request(verb, self._get_uri(uri_path), **self._process_args(kwargs))
+        response = requests.request(verb, self._get_uri(uri_path), **self._process_args(kwargs))
+        if response.ok:
+            return response.json()
+        else:
+            error = response.json(default=HttpClient._json_serial)
+            raise ClientError(uri_path, response.status_code, error)
