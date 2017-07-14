@@ -2,13 +2,14 @@ from nexosisapi.column_metadata import ColumnMetadata
 
 
 class Dataset(object):
-
-    def __init__(self, data_dict={}):
+    def __init__(self, data_dict=None):
         """
         A Dataset is the representation of your data as stored by the Nexosis API
 
         :arg dict data_dict: the dictionary containing the data for this object
         """
+        if data_dict is None:
+            data_dict = {}
         self._data = data_dict.get('data')
         self._metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
         self._links = data_dict.get('links')

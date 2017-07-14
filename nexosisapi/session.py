@@ -17,13 +17,16 @@ class SessionType(Enum):
 
 
 class Session(object):
-    def __init__(self):
-        self._session_id = None
-        self._type = None
-        self._status = None
+    def __init__(self, data_dict=None):
+        if data_dict is None:
+            data_dict = {}
+
+        self._session_id = data_dict['sessionId']
+        self._type = SessionType[data_dict['type']]
+        self._status = Status[data_dict['status']]
         self._status_history = None
-        self._dataset_name = None
-        self._target_column = None
+        self._dataset_name = data_dict['datasetName']
+        self._target_column = data_dict['targetColumn']
         self._start_date = None
         self._end_date = None
         self._links = None
@@ -85,9 +88,21 @@ class Session(object):
         return self._extra_parameters
 
 
+class SessionResponse(Session):
+    def __init__(self, data_dict):
+        super(SessionResponse, self).__init__(data_dict)
+
+    @property
+    def cost(self):
+        return self._cost
+
+    @property
+    def balance(self):
+        return self._balance
+
 class SessionResult(Session):
-    def __init__(self):
-        super(SessionResult, self).__init__()
+    def __init__(self, data_dict):
+        super(SessionResult, self).__init__(data_dict)
 
     @property
     def metrics(self):
