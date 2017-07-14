@@ -1,5 +1,5 @@
 class DatasetSummary(object):
-    def __init(self, data_dict):
+    def __init__(self, data_dict):
         self._name = data_dict['dataSetName']
         self._column_metadata = data_dict.get('columns', None)
 

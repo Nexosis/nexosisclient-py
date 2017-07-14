@@ -8,7 +8,7 @@ class ColumnType(Enum):
     date = 3
 
 
-class ColumnRole(Enum):
+class Role(Enum):
     none = 0,
     timestamp = 1,
     target = 2,
@@ -26,8 +26,8 @@ class ColumnMetadata(object):
         :arg dict data_dict: the dictionary containing the data for this object
         """
 
-        self._data_type = data_dict.get('dataType', ColumnType.string)
-        self._role = data_dict.get('role', ColumnRole.none)
+        self._data_type = ColumnType[data_dict.get('dataType', 'string')]
+        self._role = Role[data_dict.get('role', 'none')]
 
     @property
     def data_type(self):

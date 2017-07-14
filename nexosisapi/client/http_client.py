@@ -1,8 +1,21 @@
 from datetime import datetime, date
-import json
 import requests
 
 from .client_error import ClientError
+
+
+def process_response(response):
+    if len(response.content) == 0:
+        return None
+
+    # content type is probably something like 'application/json; charset: utf-8', so this processes that
+    content_type_value = response.headers['content-type']
+    content_type = content_type_value.split(';')[0]
+
+    if content_type == 'application/json':
+        return response.json()
+    else:
+        return response.content
 
 
 class HttpClient(object):
@@ -40,18 +53,18 @@ class HttpClient(object):
         else:
             args['headers'] = default_headers
 
-        # transform data to json using our serializer
+        # copy data to json for proper serialization
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
-            args['json'] = json.dumps(args['data'], default=HttpClient._json_serial)
+            args['json'] = args['data']
             del args['data']
 
         return args
 
-    # should be a better way to do this?
+    # TODO: should be a better way to do this re: the 'verb' argument
     def request(self, verb, uri_path, **kwargs):
         response = requests.request(verb, self._get_uri(uri_path), **self._process_args(kwargs))
         if response.ok:
-            return response.json()
+            return process_response(response)
         else:
-            error = response.json(default=HttpClient._json_serial)
+            error = response.json()
             raise ClientError(uri_path, response.status_code, error)
