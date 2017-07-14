@@ -2,16 +2,16 @@ from enum import Enum
 
 
 class ColumnType(Enum):
-    string = 0,
-    numeric = 1,
-    logical = 2,
+    string = 0
+    numeric = 1
+    logical = 2
     date = 3
 
 
 class Role(Enum):
-    none = 0,
-    timestamp = 1,
-    target = 2,
+    none = 0
+    timestamp = 1
+    target = 2
     feature = 3
 
 
@@ -38,14 +38,6 @@ class ColumnMetadata(object):
         """
         return self._data_type
 
-    @data_type.setter
-    def data_type(self, data_type):
-        """Sets the data_type of the metadata.
-
-        :param ColumnType data_type: the specified data type of the metadata
-        """
-        self._data_type = data_type
-
     @property
     def role(self):
         """Gets the role of the column.
@@ -54,12 +46,4 @@ class ColumnMetadata(object):
         :rtype: ColumnRole
         """
         return self._role
-
-    @role.setter
-    def role(self, role):
-        """Sets the role of this column.
-
-        :param ColumnRole role: The role of this column.
-        """
-        self._role = role
 

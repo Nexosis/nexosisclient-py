@@ -5,7 +5,7 @@ from datetime import datetime
 import csv
 
 from nexosisapi import Client, ClientError
-from nexosisapi.column_metadata import ColumnMetadata
+from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role
 
 
 class DatasetsIntegrationTests(unittest.TestCase):
@@ -37,17 +37,21 @@ class DatasetsIntegrationTests(unittest.TestCase):
         result = self.test_client.datasets.create(self.ds_name, self.data)
 
         self.assertEqual(self.ds_name, result.name)
-        self.assertEqual({'timestamp': {'dataType': 'date', 'role': 'timestamp'},
-                          'observed': {'dataType': 'numeric', 'role': 'target'}},
-                         result.column_metadata)
+        self.assertEqual(ColumnType.numeric, result.column_metadata['observed'].data_type)
+        self.assertEqual(Role.target, result.column_metadata['observed'].role)
+        self.assertEqual(ColumnType.date, result.column_metadata['timestamp'].data_type)
+        self.assertEqual(Role.timestamp, result.column_metadata['timestamp'].role)
 
     def test_create_with_metadata(self):
-        metadata = ColumnMetadata({'timestamp': {'dataType': 'date', 'role': 'timestamp'},
-                                   'observed': {'dataType': 'string', 'role': 'none'}})
+        metadata = {'observed': ColumnMetadata({'dataType': 'string', 'role': 'none'}),
+                    'timestamp': ColumnMetadata({'dataType': 'date', 'role': 'timestamp'})}
         result = self.test_client.datasets.create(self.ds_name, self.data, metadata)
 
         self.assertEqual(self.ds_name, result.name)
-        self.assertEqual(metadata, result.column_metadata)
+        self.assertEqual(metadata['observed'].data_type, result.column_metadata['observed'].data_type)
+        self.assertEqual(metadata['observed'].role, result.column_metadata['observed'].role)
+        self.assertEqual(metadata['timestamp'].data_type, result.column_metadata['timestamp'].data_type)
+        self.assertEqual(metadata['timestamp'].role, result.column_metadata['timestamp'].role)
 
     def test_create_adding_data_adds_more_data(self):
         # initial data added, items 0-9

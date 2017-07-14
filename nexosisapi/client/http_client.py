@@ -1,10 +1,13 @@
 from datetime import datetime, date
+import json
 import requests
 
+from enum import Enum
+from nexosisapi.column_metadata import ColumnMetadata
 from .client_error import ClientError
 
 
-def process_response(response):
+def _process_response(response):
     if len(response.content) == 0:
         return None
 
@@ -18,18 +21,20 @@ def process_response(response):
         return response.content
 
 
+def _json_encode(obj):
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    if isinstance(obj, ColumnMetadata):
+        return {'dataType': obj.data_type, 'role': obj.role}
+    if isinstance(obj, Enum):
+        return obj.name
+    raise TypeError("Type %s not serializable" % type(obj))
+
+
 class HttpClient(object):
     def __init__(self, key, uri):
         self._key = key
         self._uri = uri
-
-    @staticmethod
-    def _json_serial(obj):
-        """JSON serializer for datetime since it is not serializable by default json code"""
-        if isinstance(obj, (datetime, date)):
-            serial = obj.isoformat()
-            return serial
-        raise TypeError("Type %s not serializable" % type(obj))
 
     def _generate_headers(self):
         return {
@@ -55,8 +60,9 @@ class HttpClient(object):
 
         # copy data to json for proper serialization
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
-            args['json'] = args['data']
-            del args['data']
+            args['data'] = json.dumps(args['data'], default=_json_encode)
+
+        args['verify'] = False
 
         return args
 
@@ -64,7 +70,7 @@ class HttpClient(object):
     def request(self, verb, uri_path, **kwargs):
         response = requests.request(verb, self._get_uri(uri_path), **self._process_args(kwargs))
         if response.ok:
-            return process_response(response)
+            return _process_response(response)
         else:
             error = response.json()
             raise ClientError(uri_path, response.status_code, error)

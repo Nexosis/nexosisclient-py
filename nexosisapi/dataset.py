@@ -1,3 +1,6 @@
+from nexosisapi.column_metadata import ColumnMetadata
+
+
 class Dataset(object):
 
     def __init__(self, data_dict={}):
@@ -7,7 +10,7 @@ class Dataset(object):
         :arg dict data_dict: the dictionary containing the data for this object
         """
         self._data = data_dict.get('data')
-        self._metadata = data_dict.get('metadata')
+        self._metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
         self._links = data_dict.get('links')
 
     @property
