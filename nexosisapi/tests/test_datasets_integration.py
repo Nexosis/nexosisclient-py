@@ -23,7 +23,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
                                   uri=os.environ["NEXOSIS_API_TESTURI"])
         self.ds_name = "data-%s" % datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
 
-        with open('data/data.csv') as f:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
             csv_data = csv.DictReader(f)
             self.data = [dict(d) for d in csv_data]
 
@@ -68,7 +68,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(len(self.data), len(result.data))
 
     def test_create_from_csv(self):
-        with open('data/data.csv') as f:
+        with open(os.path.join(os.getcwd(), 'data/data.csv')) as f:
             result = self.test_client.datasets.create_csv(self.ds_name, f)
 
         self.assertEqual(self.ds_name, result.name)

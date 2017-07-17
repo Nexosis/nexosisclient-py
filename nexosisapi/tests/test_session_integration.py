@@ -1,6 +1,7 @@
 import csv
 import time
 import os
+
 import dateutil.parser
 import unittest
 
@@ -13,7 +14,7 @@ class SessionIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
         self.ds_name = "data-sessions-integration"
-        with open('data/data.csv') as f:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
             csv_data = csv.DictReader(f)
             self.data = [dict(d) for d in csv_data]
 
