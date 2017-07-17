@@ -1,19 +1,23 @@
 from enum import Enum
+import dateutil.parser
+
+from nexosisapi.column_metadata import ColumnMetadata
+from nexosisapi.time_interval import TimeInterval
 
 
 class Status(Enum):
-    Requested = 0,
-    Started = 1,
-    Completed = 2,
-    Cancelled = 3,
-    Failed = 4,
-    Estimated = 5
+    requested = 0,
+    started = 1,
+    completed = 2,
+    cancelled = 3,
+    failed = 4,
+    estimated = 5
 
 
 class SessionType(Enum):
-    Import = 0,
-    Forecast = 1,
-    Impact = 2
+    import_ = 0,
+    forecast = 1,
+    impact = 2
 
 
 class Session(object):
@@ -24,16 +28,18 @@ class Session(object):
         self._session_id = data_dict['sessionId']
         self._type = SessionType[data_dict['type']]
         self._status = Status[data_dict['status']]
-        self._status_history = None
-        self._dataset_name = data_dict['datasetName']
+        self._status_history = data_dict['statusHistory']
+        self._dataset_name = data_dict['dataSetName']
         self._target_column = data_dict['targetColumn']
-        self._start_date = None
-        self._end_date = None
-        self._links = None
-        self._is_estimate = None
-        self._extra_parameters = None
-        self._result_interval = None
-        self._column_metadata = None
+        self._start_date = dateutil.parser.parse(data_dict['startDate'])
+        self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        self._links = data_dict['links']
+        self._is_estimate = bool(data_dict['isEstimate'])
+        self._extra_parameters = data_dict['extraParameters']
+        self._result_interval = TimeInterval[data_dict['resultInterval']] if 'resultInterval' in data_dict.keys() and \
+                                                                             data_dict[
+                                                                                 'resultInterval'] else TimeInterval.day
+        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
 
     @property
     def session_id(self):
@@ -91,6 +97,8 @@ class Session(object):
 class SessionResponse(Session):
     def __init__(self, data_dict):
         super(SessionResponse, self).__init__(data_dict)
+        self._cost = 0
+        self._balance = 0
 
     @property
     def cost(self):
@@ -100,9 +108,13 @@ class SessionResponse(Session):
     def balance(self):
         return self._balance
 
+
 class SessionResult(Session):
     def __init__(self, data_dict):
         super(SessionResult, self).__init__(data_dict)
+
+        self._metrics = None
+        self._data = None
 
     @property
     def metrics(self):

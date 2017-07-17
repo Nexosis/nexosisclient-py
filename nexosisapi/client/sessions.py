@@ -3,6 +3,7 @@ from nexosisapi.time_interval import TimeInterval
 
 
 class Sessions(object):
+    """Session based API operations"""
     def __init__(self, client):
         self._client = client
 
@@ -19,7 +20,7 @@ class Sessions(object):
                                         'isEstimate': is_estimate,
                                         'resultInterval': result_interval.name,
                                         'callbackUrl': callback_url},
-                                    body={
+                                    data={
                                         'dataSetName': dataset_name,
                                         'columns': column_metadata
                                     })
@@ -109,10 +110,20 @@ class Sessions(object):
         :returns a list of :class:`SessionResponses`
         :rtype list
         """
-        pass
+        query = {
+            'dataSetName': dataset_name,
+            'eventName': event_name,
+            'requestedBefore': requested_before,
+            'requestedAfter': requested_after,
+            'sessionType': session_type
+        }
+        response = self._client.request('GET', 'sessions', params=query)
+
+        return [SessionResponse(item) for item in response.get('items', [])]
+
 
     def remove(self, session_id):
-        """Remove a sessions based on the session id
+        """Remove a session based on the session id
 
         :param str session_id: the session to remove
         """
@@ -122,7 +133,23 @@ class Sessions(object):
         self._client.request('DELETE', 'sessions', params=kwargs)
 
     def get_results(self, session_id):
-        return SessionResult()
+        """Get the results of a session based on the session id
+
+        :param str session_id: the session to get results for
+
+        :returns the results of computation run by the session
+        :rtype SessionResult
+        """
+        response = self._client.request('GET', 'sessions/%s/results' % session_id)
+        return SessionResult(response)
 
     def get(self, session_id):
-        return SessionResponse()
+        """Get a session based on the session id
+
+        :param str session_id: the session to get
+
+        :returns the information about the session
+        :rtype SessionResponse
+        """
+        response = self._client.request('GET', 'sessions/%s' % session_id)
+        return SessionResponse(response)

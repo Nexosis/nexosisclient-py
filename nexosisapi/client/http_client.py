@@ -62,8 +62,6 @@ class HttpClient(object):
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
             args['data'] = json.dumps(args['data'], default=_json_encode)
 
-        args['verify'] = False
-
         return args
 
     # TODO: should be a better way to do this re: the 'verb' argument

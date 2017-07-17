@@ -5,6 +5,7 @@ from nexosisapi.dataset_summary import DatasetSummary
 
 
 class Datasets(object):
+    """Dataset based API operations"""
     def __init__(self, base_client):
         self._client = base_client
 
