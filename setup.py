@@ -6,7 +6,8 @@ with open('README.md') as f:
 setup(name='nexosisapi',
       version='1.0.0',
       description='Python Client for the Nexosis API',
-      long_description=long_description,
+      long_description='This software is provided as a way to include Nexosis API functionality in your own Python '
+                       'software. You can read about the Nexosis API at https://developers.nexosis.com',
       url='http://github.com/nexosis/nexosisclient-py',
       author='Nexosis',
       author_email='support@nexosis.com',
