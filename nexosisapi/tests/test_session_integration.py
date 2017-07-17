@@ -5,7 +5,8 @@ import dateutil.parser
 import unittest
 
 from nexosisapi import Client, ClientError
-from nexosisapi.session import Status, SessionType
+from nexosisapi.session import SessionType
+from nexosisapi.status import Status
 
 
 class SessionIntegrationTests(unittest.TestCase):

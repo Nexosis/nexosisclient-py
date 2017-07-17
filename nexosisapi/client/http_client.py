@@ -45,6 +45,8 @@ class HttpClient(object):
         }
 
     def _get_uri(self, fragment):
+        if fragment.startswith('/'):
+            fragment = fragment[1:]
         return '%s/%s' % (self._uri, fragment)
 
     def _process_args(self, args):

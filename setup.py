@@ -9,7 +9,7 @@ setup(name='nexosisclient',
       license='Apache 2.0',
       packages=['nexosisclient'],
       install_requires=[
-          'requests', 'enum34'
+          'requests', 'enum34', 'python-dateutil'
       ],
       test_suite='nexosisclient.test.all',
       classifiers=(

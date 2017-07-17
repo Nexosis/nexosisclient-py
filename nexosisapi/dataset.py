@@ -23,14 +23,6 @@ class Dataset(object):
         """
         return self._data
 
-    @data.setter
-    def data(self, data):
-        """Sets the data for the Dataset.
-
-        :param list(dict) data_type: the specified data type of the metadata
-        """
-        self._data = data
-
     @property
     def metadata(self):
         """Gets the column metadata for this Dataset.
@@ -40,14 +32,6 @@ class Dataset(object):
         """
         return self._data
 
-    @metadata.setter
-    def metadata(self, metadata):
-        """Sets the column metadata for the Dataset.
-
-        :param dict(str,ColumnMetadata) metadata: a dict of ColumnMetadata keyed by column names
-        """
-        self._metadata = metadata
-
     @property
     def links(self):
         """Gets the links for this Dataset.
@@ -56,11 +40,3 @@ class Dataset(object):
         :rtype: list(dict)
         """
         return self._links
-
-    @links.setter
-    def links(self, links):
-        """Sets the links for the Dataset.
-
-        :param list(str) links: list of string links
-        """
-        self._links = links

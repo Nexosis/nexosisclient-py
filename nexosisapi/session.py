@@ -1,17 +1,10 @@
 from enum import Enum
+
 import dateutil.parser
 
 from nexosisapi.column_metadata import ColumnMetadata
+from nexosisapi.status import Status
 from nexosisapi.time_interval import TimeInterval
-
-
-class Status(Enum):
-    requested = 0,
-    started = 1,
-    completed = 2,
-    cancelled = 3,
-    failed = 4,
-    estimated = 5
 
 
 class SessionType(Enum):
@@ -33,12 +26,13 @@ class Session(object):
         self._target_column = data_dict['targetColumn']
         self._start_date = dateutil.parser.parse(data_dict['startDate'])
         self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        self._requested_date = dateutil.parser.parse(data_dict['requestedDate'])
         self._links = data_dict['links']
         self._is_estimate = bool(data_dict['isEstimate'])
         self._extra_parameters = data_dict['extraParameters']
-        self._result_interval = TimeInterval[data_dict['resultInterval']] if 'resultInterval' in data_dict.keys() and \
-                                                                             data_dict[
-                                                                                 'resultInterval'] else TimeInterval.day
+        self._result_interval = TimeInterval[data_dict['resultInterval']] \
+            if 'resultInterval' in data_dict.keys() and data_dict['resultInterval'] \
+            else TimeInterval.day
         self._column_metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
 
     @property
@@ -72,6 +66,10 @@ class Session(object):
     @property
     def end_date(self):
         return self._end_date
+
+    @property
+    def requested_date(self):
+        return self._requested_date
 
     @property
     def links(self):
