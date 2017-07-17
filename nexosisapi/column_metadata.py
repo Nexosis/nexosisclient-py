@@ -26,8 +26,8 @@ class ColumnMetadata(object):
         :arg dict data_dict: the dictionary containing the data for this object
         """
 
-        self._data_type = ColumnType[data_dict.get('dataType', 'string')]
-        self._role = Role[data_dict.get('role', 'none')]
+        self._data_type = ColumnType[data_dict.get('dataType') or 'string']
+        self._role = Role[data_dict.get('role') or 'none']
 
     @property
     def data_type(self):

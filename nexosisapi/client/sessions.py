@@ -10,21 +10,30 @@ class Sessions(object):
     def _create_session(self, dataset_name, action_type, target_column, event_name,
                         start_date, end_date, result_interval, is_estimate=False, column_metadata=None,
                         callback_url=None):
+        if dataset_name is None:
+            raise ValueError('dataset_name is required and was not provided')
+        if target_column is None:
+            raise ValueError('target_column is required and was not provided')
+        if start_date is None:
+            raise ValueError('start_date is required and was not provided')
+        if end_date is None:
+            raise ValueError('end_date is required and was not provided')
+
         return self._client.request_with_headers('POST', 'sessions/%s' % action_type,
                                                  params={
-                                        'dataSetName': dataset_name,
-                                        'targetColumn': target_column,
-                                        'eventName': event_name,
-                                        'startDate': start_date,
-                                        'endDate': end_date,
-                                        'isEstimate': is_estimate,
-                                        'resultInterval': result_interval.name,
-                                        'callbackUrl': callback_url},
+                                                     'dataSetName': dataset_name,
+                                                     'targetColumn': target_column,
+                                                     'eventName': event_name,
+                                                     'startDate': start_date,
+                                                     'endDate': end_date,
+                                                     'isEstimate': is_estimate,
+                                                     'resultInterval': result_interval.name,
+                                                     'callbackUrl': callback_url
+                                                 },
                                                  data={
-                                        'dataSetName': dataset_name,
-                                        'columns': column_metadata
-                                    })
-
+                                                     'dataSetName': dataset_name,
+                                                     'columns': column_metadata
+                                                 })
 
     def create_forecast(self, dataset_name, target_column, start_date, end_date, result_interval=TimeInterval.day,
                         callback_url=None):
@@ -60,8 +69,7 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(dataset_name, 'impact', target_column, event_name, start_date,
-                                                    end_date,
-                                                    result_interval, callback_url=callback_url)
+                                                    end_date, result_interval, callback_url=callback_url)
         return SessionResponse(response, headers)
 
     def estimate_forecast(self, dataset_name, target_column, start_date, end_date, result_interval=TimeInterval.day):
@@ -95,8 +103,7 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(dataset_name, 'impact', target_column, event_name, start_date,
-                                                    end_date,
-                                                    result_interval, is_estimate=True)
+                                                    end_date, result_interval, is_estimate=True)
         return SessionResponse(response, headers)
 
     def list(self, dataset_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None):
@@ -122,12 +129,14 @@ class Sessions(object):
 
         return [SessionResponse(item, headers) for item in response.get('items', [])]
 
-
     def remove(self, session_id):
         """Remove a session based on the session id
 
         :param str session_id: the session to remove
         """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
         self._client.request('DELETE', 'sessions/%s' % session_id)
 
     def remove_sessions(self, **kwargs):
@@ -141,6 +150,9 @@ class Sessions(object):
         :returns the results of computation run by the session
         :rtype SessionResult
         """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
         response = self._client.request('GET', 'sessions/%s/results' % session_id)
         return SessionResult(response)
 
@@ -152,5 +164,8 @@ class Sessions(object):
         :returns the information about the session
         :rtype SessionResponse
         """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
         response, _, headers = self._client.request_with_headers('GET', 'sessions/%s' % session_id)
         return SessionResponse(response, headers)

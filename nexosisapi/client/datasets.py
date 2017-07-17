@@ -1,5 +1,3 @@
-import json
-
 from nexosisapi.dataset import Dataset
 from nexosisapi.dataset_summary import DatasetSummary
 
@@ -87,6 +85,8 @@ class Datasets(object):
         """
         if dataset_name is None:
             raise ValueError('dataset_name is required and was not provided')
+        if csv_file is None:
+            raise ValueError('csv_file is required and was not provided')
 
         params = Datasets.process_parameters(page_number, page_size, start_date, end_date, include)
 
@@ -106,6 +106,8 @@ class Datasets(object):
         When 'forecast' is included, all related forecasts will be removed.
         When 'session' is include, all related sessions will be removed.
         """
+        if dataset_name is None:
+            raise ValueError('dataset_name is required and was not provided')
 
         filter_options = {}
         if start_date:
