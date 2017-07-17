@@ -95,10 +95,12 @@ class Session(object):
 
 
 class SessionResponse(Session):
-    def __init__(self, data_dict):
+    def __init__(self, data_dict, headers):
         super(SessionResponse, self).__init__(data_dict)
-        self._cost = 0
-        self._balance = 0
+        if 'nexosis-request-cost' in headers.keys():
+            self._cost = headers.get('nexosis-request-cost')
+        if 'nexosis-account-balance' in headers.keys():
+            self._balance = headers.get('nexosis-account-balance')
 
     @property
     def cost(self):
@@ -113,8 +115,8 @@ class SessionResult(Session):
     def __init__(self, data_dict):
         super(SessionResult, self).__init__(data_dict)
 
-        self._metrics = None
-        self._data = None
+        self._metrics = data_dict['metrics']
+        self._data = data_dict['data']
 
     @property
     def metrics(self):

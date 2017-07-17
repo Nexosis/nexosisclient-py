@@ -9,16 +9,16 @@ from .client_error import ClientError
 
 def _process_response(response):
     if len(response.content) == 0:
-        return None
+        return None, 0, None
 
     # content type is probably something like 'application/json; charset: utf-8', so this processes that
     content_type_value = response.headers['content-type']
     content_type = content_type_value.split(';')[0]
 
     if content_type == 'application/json':
-        return response.json()
+        return response.json(), response.status_code, response.headers
     else:
-        return response.content
+        return response.content, response.status_code, response.headers
 
 
 def _json_encode(obj):
@@ -64,11 +64,15 @@ class HttpClient(object):
 
         return args
 
-    # TODO: should be a better way to do this re: the 'verb' argument
-    def request(self, verb, uri_path, **kwargs):
+    def request_with_headers(self, verb, uri_path, **kwargs):
         response = requests.request(verb, self._get_uri(uri_path), **self._process_args(kwargs))
         if response.ok:
             return _process_response(response)
         else:
             error = response.json()
             raise ClientError(uri_path, response.status_code, error)
+
+    # TODO: should be a better way to do this re: the 'verb' argument
+    def request(self, verb, uri_path, **kwargs):
+        response, _, _ = self.request_with_headers(verb, uri_path, **kwargs)
+        return response

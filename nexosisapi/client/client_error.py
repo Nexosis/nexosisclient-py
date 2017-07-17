@@ -1,9 +1,9 @@
 class ErrorResponse(object):
     def __init__(self, body):
-        self._status = body['statusCode']
-        self._message = body['message']
-        self._error_type = body['errorType']
-        self._details = body['errorDetails']
+        self._status = body.get('statusCode')
+        self._message = body.get('message')
+        self._error_type = body.get('errorType')
+        self._details = body.get('errorDetails')
 
     @property
     def status(self):

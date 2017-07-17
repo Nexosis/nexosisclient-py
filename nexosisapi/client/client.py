@@ -39,21 +39,12 @@ class Client(object):
 
     def get_account_balance(self):
         """get_account_balance"""
-        response = self._client.request('GET', 'data')
-        if response.status_code == 200:
-            header = response.headers['nexosis-account-balance']
+        response, status, headers = self._client.request_with_headers('GET', 'data')
+        if status == 200:
+            header = headers['nexosis-account-balance']
             if header is not None:
                 value = header.split(' ')[0]
                 return float(value)
 
         response.raise_for_status()
 
-    def get_status(self, session_id):
-        """get_status"""
-        resp = self._client.request('HEAD', 'sessions/%s' % session_id)
-        return None, resp.status_code, resp.headers
-
-    def get_results(self, session_id):
-        """get_results"""
-        resp = self._client.request('GET', 'sessions/%s/results' % session_id)
-        return resp.json(), resp.status_code, resp.headers

@@ -1,7 +1,7 @@
 import csv
 import time
 import os
-from datetime import datetime
+import dateutil.parser
 import unittest
 
 from nexosisapi import Client, ClientError
@@ -28,7 +28,17 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def tearDown(self):
         try:
-            self.test_client.datasets.remove(self.ds_name)
+            session_list = self.test_client.sessions.list()
+
+            for session in session_list:
+                if session.dataset_name != self.ds_name:
+                    self.test_client.sessions.remove(session.session_id)
+
+            dataset_list = self.test_client.datasets.list('test-session-integration')
+
+            for dataset in dataset_list:
+                self.test_client.datasets.remove(dataset.name)
+
         except ClientError:
             pass
 
@@ -40,35 +50,83 @@ class SessionIntegrationTests(unittest.TestCase):
         self.assertEqual(1, len(name))
 
     def test_create_forecast(self):
-        pass
+        self.test_client.datasets.create('test-session-integration-forecast', self.data)
+        forecast = self.test_client.sessions.create_forecast(self.ds_name, 'observed',
+                                                             dateutil.parser.parse('2008-09-01'),
+                                                             dateutil.parser.parse('2008-09-30'))
+
+        self.assertIsNotNone(forecast)
+        self.assertEqual(SessionType.forecast, forecast.type)
 
     def test_estimate_forecast(self):
-        pass
+        self.test_client.datasets.create('test-session-integration-forecast', self.data)
+        forecast = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
+                                                               dateutil.parser.parse('2008-09-01'),
+                                                               dateutil.parser.parse('2008-09-30'))
+
+        self.assertIsNotNone(forecast)
+        self.assertTrue(forecast.is_estimate)
+        self.assertEqual('2.90 USD', forecast.cost)
 
     def test_create_impact(self):
-        pass
+        self.test_client.datasets.create('test-session-integration-impact', self.data)
+        impact = self.test_client.sessions.analyze_impact(self.ds_name, 'observed',
+                                                          'create-impact-test',
+                                                          dateutil.parser.parse('2008-08-01'),
+                                                          dateutil.parser.parse('2008-08-31'))
+
+        self.assertIsNotNone(impact)
+
+        self.assertEqual(SessionType.impact, impact.type)
 
     def test_estimate_impact(self):
-        pass
+        self.test_client.datasets.create('test-session-integration-impact', self.data)
+        impact = self.test_client.sessions.estimate_impact(self.ds_name, 'observed',
+                                                           'create-impact-test',
+                                                           dateutil.parser.parse('2008-08-01'),
+                                                           dateutil.parser.parse('2008-08-31'))
+
+        self.assertIsNotNone(impact)
+
+        self.assertTrue(impact.is_estimate)
+        self.assertEqual('3.00 USD', impact.cost)
 
     def test_get_results(self):
-        pass
+        results = self.test_client.sessions.get_results(self.forecast.session_id)
+
+        self.assertEqual(len(results.data), 29)
 
     def test_remove_session(self):
-        pass
+        session = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
+                                                              dateutil.parser.parse('2008-09-01'),
+                                                              dateutil.parser.parse('2008-09-30'))
 
-    def test_remove_sessions(self):
-        pass
+        self.test_client.sessions.remove(session.session_id)
+
+        try:
+            self.test_client.sessions.get(session.session_id)
+        except ClientError as e:
+            self.assertEqual(404, e.status)
+        else:
+            self.assertFalse(True, 'Should have thrown a 404 error.')
 
     def test_create_session_no_data_error(self):
-        pass
+        try:
+            self.test_client.sessions.create_forecast('does-not-exist', 'something',
+                                                      dateutil.parser.parse('2008-09-01'),
+                                                      dateutil.parser.parse('2008-09-30'))
+        except ClientError as e:
+            if e.status != 404:
+                self.assertFalse(True, 'Should have thrown 404 error.')
 
     def test_create_session_bad_dates(self):
-        pass
-
-
-
-
+        try:
+            self.test_client.sessions.create_forecast(self.ds_name, 'observed',
+                                                      dateutil.parser.parse('2017-09-01'),
+                                                      dateutil.parser.parse('2008-09-30'))
+        except ClientError as e:
+            if e.status != 400:
+                self.assertFalse(True, 'Should have thrown 400 error.')
 
     def _setup_sessions(self):
         # check if we have a session data for forecast and impact, and if not, kick them off
@@ -81,13 +139,13 @@ class SessionIntegrationTests(unittest.TestCase):
 
         if self.forecast is None:
             self.forecast = self.test_client.sessions.create_forecast(self.ds_name, 'observed',
-                                                                      datetime.strptime('2008-09-01', '%Y-%m-%d'),
-                                                                      datetime.strptime('2008-09-30', '%Y-%m-%d'))
+                                                                      dateutil.parser.parse('2008-09-01'),
+                                                                      dateutil.parser.parse('2008-09-30'))
         if self.impact is None:
             self.impact = self.test_client.sessions.analyze_impact(self.ds_name, 'observed',
                                                                    'integration-test-analysis',
-                                                                   datetime.strptime('2008-08-01', '%Y-%m-%d'),
-                                                                   datetime.strptime('2008-08-31', '%Y-%m-%d'))
+                                                                   dateutil.parser.parse('2008-08-01'),
+                                                                   dateutil.parser.parse('2008-08-31'))
 
         counter = 0
         while self.impact.status != Status.completed and self.forecast.status != Status.completed:

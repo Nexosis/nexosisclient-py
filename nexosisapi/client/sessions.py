@@ -10,8 +10,8 @@ class Sessions(object):
     def _create_session(self, dataset_name, action_type, target_column, event_name,
                         start_date, end_date, result_interval, is_estimate=False, column_metadata=None,
                         callback_url=None):
-        resp = self._client.request('POST', 'sessions/%s' % action_type,
-                                    params={
+        return self._client.request_with_headers('POST', 'sessions/%s' % action_type,
+                                                 params={
                                         'dataSetName': dataset_name,
                                         'targetColumn': target_column,
                                         'eventName': event_name,
@@ -20,12 +20,11 @@ class Sessions(object):
                                         'isEstimate': is_estimate,
                                         'resultInterval': result_interval.name,
                                         'callbackUrl': callback_url},
-                                    data={
+                                                 data={
                                         'dataSetName': dataset_name,
                                         'columns': column_metadata
                                     })
 
-        return resp
 
     def create_forecast(self, dataset_name, target_column, start_date, end_date, result_interval=TimeInterval.day,
                         callback_url=None):
@@ -41,9 +40,9 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response = self._create_session(dataset_name, 'forecast', target_column, None, start_date, end_date,
-                                        result_interval, callback_url=callback_url)
-        return SessionResponse(response)
+        response, _, headers = self._create_session(dataset_name, 'forecast', target_column, None, start_date, end_date,
+                                                    result_interval, callback_url=callback_url)
+        return SessionResponse(response, headers)
 
     def analyze_impact(self, dataset_name, target_column, event_name, start_date, end_date,
                        result_interval=TimeInterval.day, callback_url=None):
@@ -60,9 +59,10 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response = self._create_session(dataset_name, 'impact', target_column, event_name, start_date, end_date,
-                                        result_interval, callback_url=callback_url)
-        return SessionResponse(response)
+        response, _, headers = self._create_session(dataset_name, 'impact', target_column, event_name, start_date,
+                                                    end_date,
+                                                    result_interval, callback_url=callback_url)
+        return SessionResponse(response, headers)
 
     def estimate_forecast(self, dataset_name, target_column, start_date, end_date, result_interval=TimeInterval.day):
         """Estimate a new forecast for a dataset
@@ -76,9 +76,9 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response = self._create_session(dataset_name, 'forecast', target_column, None, start_date, end_date,
-                                        result_interval, is_estimate=True)
-        return SessionResponse(response)
+        response, _, headers = self._create_session(dataset_name, 'forecast', target_column, None, start_date, end_date,
+                                                    result_interval, is_estimate=True)
+        return SessionResponse(response, headers)
 
     def estimate_impact(self, dataset_name, target_column, event_name, start_date, end_date,
                         result_interval=TimeInterval.day):
@@ -94,9 +94,10 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response = self._create_session(dataset_name, 'impact', target_column, event_name, start_date, end_date,
-                                        result_interval, is_estimate=True)
-        return SessionResponse(response)
+        response, _, headers = self._create_session(dataset_name, 'impact', target_column, event_name, start_date,
+                                                    end_date,
+                                                    result_interval, is_estimate=True)
+        return SessionResponse(response, headers)
 
     def list(self, dataset_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None):
         """list the created sessions, optionally filtering on session parameters
@@ -117,9 +118,9 @@ class Sessions(object):
             'requestedAfter': requested_after,
             'sessionType': session_type
         }
-        response = self._client.request('GET', 'sessions', params=query)
+        response, _, headers = self._client.request_with_headers('GET', 'sessions', params=query)
 
-        return [SessionResponse(item) for item in response.get('items', [])]
+        return [SessionResponse(item, headers) for item in response.get('items', [])]
 
 
     def remove(self, session_id):
@@ -151,5 +152,5 @@ class Sessions(object):
         :returns the information about the session
         :rtype SessionResponse
         """
-        response = self._client.request('GET', 'sessions/%s' % session_id)
-        return SessionResponse(response)
+        response, _, headers = self._client.request_with_headers('GET', 'sessions/%s' % session_id)
+        return SessionResponse(response, headers)
