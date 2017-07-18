@@ -68,7 +68,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(len(self.data), len(result.data))
 
     def test_create_from_csv(self):
-        with open(os.path.join(os.getcwd(), 'data/data.csv')) as f:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
             result = self.test_client.datasets.create_csv(self.ds_name, f)
 
         self.assertEqual(self.ds_name, result.name)

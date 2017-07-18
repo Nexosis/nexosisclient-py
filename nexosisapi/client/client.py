@@ -12,8 +12,8 @@ from nexosisapi import NEXOSIS_API_KEY
 
 
 class Client(object):
-    def __init__(self, key=os.environ[NEXOSIS_API_KEY], uri='https://ml.nexosis.com/v1', client=None):
-        self._key = key
+    def __init__(self, key=None, uri='https://ml.nexosis.com/v1', client=None):
+        self._key = key or os.environ[NEXOSIS_API_KEY]
         if uri.endswith('/'):
             uri = uri[:-1]
         self._uri = uri
