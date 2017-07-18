@@ -12,6 +12,8 @@ from nexosisapi.status import Status
 
 class SessionIntegrationTests(unittest.TestCase):
     def setUp(self):
+        self.forecast = None
+        self.impact = None
         self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
         self.ds_name = "data-sessions-integration"
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
