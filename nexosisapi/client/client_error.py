@@ -22,7 +22,7 @@ class ErrorResponse(object):
         return self._details
 
 
-class ClientError(BaseException):
+class ClientError(Exception):
     def __init__(self, url, status, body):
         self._url = url
         self._status = status

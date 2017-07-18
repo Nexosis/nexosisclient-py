@@ -53,7 +53,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_create_forecast(self):
         self.test_client.datasets.create('test-session-integration-forecast', self.data)
-        forecast = self.test_client.sessions.create_forecast(self.ds_name, 'observed',
+        forecast = self.test_client.sessions.create_forecast('test-session-integration-forecast', 'observed',
                                                              dateutil.parser.parse('2008-09-01'),
                                                              dateutil.parser.parse('2008-09-30'))
 
@@ -62,7 +62,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_estimate_forecast(self):
         self.test_client.datasets.create('test-session-integration-forecast', self.data)
-        forecast = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
+        forecast = self.test_client.sessions.estimate_forecast('test-session-integration-forecast', 'observed',
                                                                dateutil.parser.parse('2008-09-01'),
                                                                dateutil.parser.parse('2008-09-30'))
 
@@ -72,7 +72,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_create_impact(self):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
-        impact = self.test_client.sessions.analyze_impact(self.ds_name, 'observed',
+        impact = self.test_client.sessions.analyze_impact('test-session-integration-impact', 'observed',
                                                           'create-impact-test',
                                                           dateutil.parser.parse('2008-08-01'),
                                                           dateutil.parser.parse('2008-08-31'))
@@ -83,7 +83,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_estimate_impact(self):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
-        impact = self.test_client.sessions.estimate_impact(self.ds_name, 'observed',
+        impact = self.test_client.sessions.estimate_impact('test-session-integration-impact', 'observed',
                                                            'create-impact-test',
                                                            dateutil.parser.parse('2008-08-01'),
                                                            dateutil.parser.parse('2008-08-31'))
