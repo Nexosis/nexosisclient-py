@@ -9,15 +9,6 @@ from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role
 
 
 class DatasetsIntegrationTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cleanup = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
-
-        ds_list = cleanup.datasets.list()
-
-        for ds in ds_list:
-            cleanup.datasets.remove(ds.name)
-
     def setUp(self):
         self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"],
                                   uri=os.environ["NEXOSIS_API_TESTURI"])
