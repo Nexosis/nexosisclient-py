@@ -6,6 +6,7 @@ class ColumnType(Enum):
     numeric = 1
     logical = 2
     date = 3
+    numericMeasure = -1
 
 
 class Role(Enum):
@@ -13,6 +14,20 @@ class Role(Enum):
     timestamp = 1
     target = 2
     feature = 3
+
+
+class Imputation(Enum):
+    zeroes = 0
+    mean = 1
+    median = 2
+    mode = 3
+
+
+class Aggregation(Enum):
+    sum = 0
+    mean = 1
+    median = 2
+    mode = 3
 
 
 class ColumnMetadata(object):
@@ -26,8 +41,15 @@ class ColumnMetadata(object):
         :arg dict data_dict: the dictionary containing the data for this object
         """
 
+        impute = data_dict.get('imputation')
+        aggregate = data_dict.get('aggregation')
+
         self._data_type = ColumnType[data_dict.get('dataType') or 'string']
         self._role = Role[data_dict.get('role') or 'none']
+        self._imputation = Imputation[impute] if impute is not None else None
+        self._aggregation = Aggregation[aggregate] if aggregate is not None else None
+        
+        
 
     @property
     def data_type(self):
@@ -46,4 +68,22 @@ class ColumnMetadata(object):
         :rtype: ColumnRole
         """
         return self._role
+
+    @property
+    def imputation(self):
+        """Gets the imputation strategy of the column.
+
+        :return: The imputation strategy of the column.
+        :rtype: Imputation
+        """
+        return self._imputation
+
+    @property
+    def aggregation(self):
+        """Gets the aggregation strategy of the column.
+
+        :return: The aggregation strategy of the column.
+        :rtype: Aggregation
+        """
+        return self._aggregation
 

@@ -3,9 +3,10 @@ import tempfile
 import unittest
 from datetime import datetime
 import csv
+import json
 
 from nexosisapi import Client, ClientError
-from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role
+from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role, Imputation, Aggregation
 
 
 class DatasetsIntegrationTests(unittest.TestCase):
@@ -33,6 +34,14 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(ColumnType.date, result.column_metadata['timestamp'].data_type)
         self.assertEqual(Role.timestamp, result.column_metadata['timestamp'].role)
 
+    def test_create_with_measure_type(self):
+        metadata = {'observed': ColumnMetadata({'dataType': 'numericMeasure', 'role': 'target'}),
+                    'timestamp': ColumnMetadata({'dataType': 'date', 'role': 'timestamp'})}
+        result = self.test_client.datasets.create(self.ds_name, self.data, metadata)
+
+        self.assertEqual(Imputation.mean, result.column_metadata['observed'].imputation)
+        self.assertEqual(Aggregation.mean, result.column_metadata['observed'].aggregation)
+
     def test_create_with_metadata(self):
         metadata = {'observed': ColumnMetadata({'dataType': 'string', 'role': 'none'}),
                     'timestamp': ColumnMetadata({'dataType': 'date', 'role': 'timestamp'})}
@@ -43,6 +52,17 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(metadata['observed'].role, result.column_metadata['observed'].role)
         self.assertEqual(metadata['timestamp'].data_type, result.column_metadata['timestamp'].data_type)
         self.assertEqual(metadata['timestamp'].role, result.column_metadata['timestamp'].role)
+
+    def test_create_assign_imputation_aggregation(self):
+        metadata = {'observed': ColumnMetadata({'dataType': 'numeric', 'role': 'target', 'imputation' : 'mode', 'aggregation' : 'median'}),
+                    'timestamp': ColumnMetadata({'dataType': 'date', 'role': 'timestamp'})}
+
+        result = self.test_client.datasets.create(self.ds_name, self.data, metadata)
+
+        self.assertEqual(self.ds_name, result.name)
+        self.assertEqual(Aggregation.median, result.column_metadata['observed'].aggregation)
+        self.assertEqual(Imputation.mode, result.column_metadata['observed'].imputation)
+
 
     def test_create_adding_data_adds_more_data(self):
         # initial data added, items 0-9
