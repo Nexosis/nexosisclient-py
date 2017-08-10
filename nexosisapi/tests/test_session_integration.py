@@ -70,7 +70,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
         self.assertIsNotNone(forecast)
         self.assertTrue(forecast.is_estimate)
-        self.assertEqual('2.90 USD', forecast.cost)
+        self.assertEqual('0.01 USD', forecast.cost)
 
     def test_create_impact(self):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
@@ -93,7 +93,7 @@ class SessionIntegrationTests(unittest.TestCase):
         self.assertIsNotNone(impact)
 
         self.assertTrue(impact.is_estimate)
-        self.assertEqual('3.00 USD', impact.cost)
+        self.assertEqual('0.01 USD', impact.cost)
 
     def test_get_results(self):
         results = self.test_client.sessions.get_results(self.forecast.session_id)

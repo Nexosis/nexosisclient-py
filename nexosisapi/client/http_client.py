@@ -25,7 +25,12 @@ def _json_encode(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     if isinstance(obj, ColumnMetadata):
-        return {'dataType': obj.data_type, 'role': obj.role}
+        json = {'dataType': obj.data_type, 'role': obj.role}
+        if(obj.imputation is not None):
+            json['imputation'] = obj.imputation
+        if(obj.aggregation is not None):
+            json['aggregation'] = obj.aggregation
+        return json
     if isinstance(obj, Enum):
         return obj.name
     raise TypeError("Type %s not serializable" % type(obj))
@@ -63,7 +68,7 @@ class HttpClient(object):
         # copy data to json for proper serialization
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
             args['data'] = json.dumps(args['data'], default=_json_encode)
-
+       
         return args
 
     def request_with_headers(self, verb, uri_path, **kwargs):
