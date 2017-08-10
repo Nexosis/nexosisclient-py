@@ -1,15 +1,17 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-# command to install dependencies
-install: "pip install -r requirements.txt"
-# command to run tests
-script: 
-  - "python setup.py test"
-  - "python setup.py sdist"
-
-
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
+install: pip install -r requirements.txt
+script:
+- python setup.py test
+- python setup.py sdist
+deploy:
+  provider: pypi
+  password:
+    secure: iifKMYgxITiia/MeRAFRrzN70ELb9WsDwx0lzYS7V3nenGhJ70GmrMojIqAYv5sFsiTJkJMKSMHOe1Br8pHWhwUmcC3OUPVqH39HrwTycnpNw68F3eGI8I+ZwNm6KJ0Pnx0jq+oic2OZTLNBVrqSKCq7zDmGfvoy59t3ua15HktoBAkIqSTEQDWsLWqLQSKfHL9P3S5NaUoZzRJ9aRwODOy/xXETvfwWGW1UWn26XwTpEfiBa8cPYUnQMF74UeP7lLFZNmOOdyN7UPSSBI97gGbmKIMUqgR5ltGeM5MeuHBTp/igEbgi9kJC4wH9tEQL9xkBLfjrSRwb1dkfY/+oG2wer4HSS7nqvtIDntCWyRSW2qBevy998IG341vDQU+9Hse21YJjtCdxkmzRucx8hlmnTQ3WLcrEZaa76MtHH7CtW2lN/pPnkm9LhTnlr3LAzHYtEsPiVy4WBfO3TlEtOpkR0vVSJ6g7u06ux9/PrpD64CVKEKkKPEofOebLWi+tNXgUdkR9dg5JpqQnFLCwMMuzRwBLvE0HW0xs+Ls14DDMN3HAuH9er1c6HUZnfnpzOinJFWZZW1cwQ3phnzrnTXFkgNL1X77yOA5hgOv/pchm1aS4d1NII88a/ffDpQsofDJWLxPajKHyBoksu3qAV5PIlq6QuvKTADWw7tSri2I=
+  user:
+    secure: B9A/ALnM1FhdOUdj9BS2hAsRPXGD/4o88hkQmo/J03o0QFGdpP4nvhsApQsUwdEvc2wfIZfcCpbJkJ7f9/v4ZpwDtVRdxsuYUcFeCnGZJiIf2hVu4DN2fB/xcMPTisdEIkIGgxCsLa5mDb67lICr8STzCVxNJv7qJ/F6hJQp2YBY9olmAmo73J022hnHs7fYTTB6IFFnHsB861AiYVbhaMoE7POGUINeJ7CMi5IRDL5acbxfwcnK4wg9jNt1VB0KDYvLDZN+nZK5tmxiMVw3REM6UjEbjq/lMf3WZUK0JHLOXhsQTW0aVDHgJIKwg4NYjTZex6QtYaOd2CKlO9N55cNS8VlyOy0iEjpJYB9BphkcgoIb5muIOZBEkmDRRfihELC6+uWQBNJqTiHJmXVSmdU5aMi5qk2PMnm3dz/qGV60830sZzP+Q4a+E8rBEyo8NMWeEuTBLjvSLZg9m6B2RA50JdWDBYMwe2l4v9cT5KIfcX+uCFDLzwh6YJinfAXNr1khYi1+RTWwClchNlA6riRdY7sNvbXieXj8rHbfJBaAIFUsrKdyniMFwpMftSxLx7rg+IvX7lZal0zFGShp6N9YzwkgfXiD7987XwBPTWVnjpwxKN/rQaTNNOyfpxSHGc7SLU+zKk6VK5yjilYwQ4On47M/LeT0Quxzcl59rDw=
