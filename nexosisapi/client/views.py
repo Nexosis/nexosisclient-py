@@ -36,7 +36,7 @@ class Views(object):
         view = ViewDefinition({
             'viewName': name,
             'dataSetName': dataset_name,
-            'joins': [Join({'dataSet': {'name': right_datasource_name}})]
+            'joins': [{'dataSet': {'name': right_datasource_name}}]
         })
 
         return self.create_by_definition(view)
