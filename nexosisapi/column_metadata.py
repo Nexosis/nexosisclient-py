@@ -33,13 +33,15 @@ class Aggregation(Enum):
 class ColumnMetadata(object):
     """The data describing a column in a dataset."""
 
-    def __init__(self, data_dict={}):
+    def __init__(self, data_dict=None):
         """Create an instance with the data or defaults
 
         Defaults to data_type = ColumnType.string and role = ColumnRole.none
 
         :arg dict data_dict: the dictionary containing the data for this object
         """
+        if data_dict is None:
+            data_dict = {}
 
         impute = data_dict.get('imputation')
         aggregate = data_dict.get('aggregation')
@@ -48,8 +50,6 @@ class ColumnMetadata(object):
         self._role = Role[data_dict.get('role') or 'none']
         self._imputation = Imputation[impute] if impute is not None else None
         self._aggregation = Aggregation[aggregate] if aggregate is not None else None
-        
-        
 
     @property
     def data_type(self):
@@ -86,4 +86,3 @@ class ColumnMetadata(object):
         :rtype: Aggregation
         """
         return self._aggregation
-

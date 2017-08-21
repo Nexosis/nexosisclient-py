@@ -27,8 +27,8 @@ class Dataset(object):
     def metadata(self):
         """Gets the column metadata for this Dataset.
 
-        :return: The data.
-        :rtype: list(dict)
+        :return: The column metadata.
+        :rtype: list(ColumnMetadata)
         """
         return self._data
 

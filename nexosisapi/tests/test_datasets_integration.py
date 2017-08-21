@@ -3,7 +3,6 @@ import tempfile
 import unittest
 from datetime import datetime
 import csv
-import json
 
 from nexosisapi import Client, ClientError
 from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role, Imputation, Aggregation

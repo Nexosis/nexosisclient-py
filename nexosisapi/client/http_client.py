@@ -4,6 +4,7 @@ import requests
 
 from enum import Enum
 from nexosisapi.column_metadata import ColumnMetadata
+from nexosisapi.view_definition import ViewDefinition, Join, ColumnOptions
 from .client_error import ClientError
 
 
@@ -26,13 +27,30 @@ def _json_encode(obj):
         return obj.isoformat()
     if isinstance(obj, ColumnMetadata):
         json = {'dataType': obj.data_type, 'role': obj.role}
-        if(obj.imputation is not None):
+        if obj.imputation is not None:
             json['imputation'] = obj.imputation
-        if(obj.aggregation is not None):
+        if obj.aggregation is not None:
             json['aggregation'] = obj.aggregation
         return json
     if isinstance(obj, Enum):
         return obj.name
+    if isinstance(obj, ViewDefinition):
+        return {
+            'viewName': obj.view_name,
+            'dataSetName': obj.dataset_name,
+            'columns': obj.column_metadata,
+            'joins': obj.joins
+        }
+    if isinstance(obj, Join):
+        return {
+            'dataSet': {'name': obj.dataset_name},
+            'columnOptions': obj.column_options,
+            'joins': obj.joins
+        }
+    if isinstance(obj, ColumnOptions):
+        return {
+            'joinInterval': obj.join_interval
+        }
     raise TypeError("Type %s not serializable" % type(obj))
 
 
@@ -68,7 +86,7 @@ class HttpClient(object):
         # copy data to json for proper serialization
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
             args['data'] = json.dumps(args['data'], default=_json_encode)
-       
+
         return args
 
     def request_with_headers(self, verb, uri_path, **kwargs):
