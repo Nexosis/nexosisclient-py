@@ -87,8 +87,6 @@ class HttpClient(object):
         if 'data' in args and args['headers']['Content-Type'] == 'application/json':
             args['data'] = json.dumps(args['data'], default=_json_encode)
 
-        args['verify'] = False
-
         return args
 
     def request_with_headers(self, verb, uri_path, **kwargs):

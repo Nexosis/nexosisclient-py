@@ -61,7 +61,7 @@ class ViewDefinition(object):
 
         self._view_name = data_dict['viewName']
         self._dataset_name = data_dict['dataSetName']
-        self._column_metadata = [ColumnMetadata(c) for c in data_dict.get('columns', [])]
+        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('columns', {}).items()}
         self._joins = [Join(j) for j in data_dict.get('joins', [])]
 
     @property
