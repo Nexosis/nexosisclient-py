@@ -53,4 +53,3 @@ class Client(object):
                 return float(value)
 
         response.raise_for_status()
-
