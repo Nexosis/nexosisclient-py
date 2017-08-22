@@ -1,10 +1,12 @@
 from datetime import datetime, date
+from enum import Enum
 import json
 import requests
 
-from enum import Enum
 from nexosisapi.column_metadata import ColumnMetadata
-from nexosisapi.view_definition import ViewDefinition, Join, ColumnOptions
+from nexosisapi.view_definition import ViewDefinition
+from nexosisapi.join import Join
+from nexosisapi.column_options import ColumnOptions
 from .client_error import ClientError
 
 
@@ -26,12 +28,12 @@ def _json_encode(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     if isinstance(obj, ColumnMetadata):
-        json = {'dataType': obj.data_type, 'role': obj.role}
+        val = {'dataType': obj.data_type, 'role': obj.role}
         if obj.imputation is not None:
-            json['imputation'] = obj.imputation
+            val['imputation'] = obj.imputation
         if obj.aggregation is not None:
-            json['aggregation'] = obj.aggregation
-        return json
+            val['aggregation'] = obj.aggregation
+        return val
     if isinstance(obj, Enum):
         return obj.name
     if isinstance(obj, ViewDefinition):

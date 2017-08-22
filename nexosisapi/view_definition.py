@@ -1,56 +1,5 @@
-from nexosisapi.time_interval import TimeInterval
 from nexosisapi.column_metadata import ColumnMetadata
-
-
-class ColumnOptions(object):
-    """The options defined on a specific column within a join"""
-
-    def __init__(self, data_dict):
-        if data_dict is None:
-            data_dict = {}
-
-        self._join_interval = TimeInterval(data_dict['joinInterval'])
-
-    @property
-    def join_interval(self):
-        """Optional interval of a time series column being joined to another time series
-
-           Note: not valid outside of join defintion
-
-           :return: the interval to join to the other time series at
-           :rtype: TimeInterval
-        """
-        return self._join_interval
-
-
-class Join(object):
-    """An object that represents the definition of a join within a view"""
-
-    def __init__(self, data_dict):
-        if data_dict is None:
-            data_dict = {}
-
-        self._dataset_name = data_dict.get('dataSet', {})['name']
-        self._column_options = {key: ColumnOptions(value) for (key, value) in data_dict.get('columnOptions', {}).items()}
-        self._joins = [Join(j) for j in data_dict.get('joins', [])]
-
-    @property
-    def dataset_name(self):
-        return self._dataset_name
-
-    @property
-    def column_options(self):
-        return self._column_options
-
-    @property
-    def joins(self):
-        """Optional data source to be joined to this data source
-
-        :return: list of zero or more additional joins
-        :rtype: list
-        """
-        return self._joins
-
+from nexosisapi.join import Join
 
 class ViewDefinition(object):
     """A description of the definition of a view"""
