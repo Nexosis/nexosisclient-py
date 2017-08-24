@@ -59,7 +59,7 @@ def _json_encode(obj):
 class HttpClient(object):
     def __init__(self, key, uri):
         self._key = key
-        self._uri = uri
+        self._uri = uri[0:-1] if uri.endswith('/') else uri
 
     def _generate_headers(self):
         return {

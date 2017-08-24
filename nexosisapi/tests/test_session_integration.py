@@ -65,8 +65,8 @@ class SessionIntegrationTests(unittest.TestCase):
     def test_estimate_forecast(self):
         self.test_client.datasets.create('test-session-integration-forecast', self.data)
         forecast = self.test_client.sessions.estimate_forecast('test-session-integration-forecast', 'observed',
-                                                               dateutil.parser.parse('2008-09-01'),
-                                                               dateutil.parser.parse('2008-09-30'))
+                                                               dateutil.parser.parse('2008-07-01'),
+                                                               dateutil.parser.parse('2008-07-31'))
 
         self.assertIsNotNone(forecast)
         self.assertTrue(forecast.is_estimate)
@@ -87,8 +87,8 @@ class SessionIntegrationTests(unittest.TestCase):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
         impact = self.test_client.sessions.estimate_impact('test-session-integration-impact', 'observed',
                                                            'create-impact-test',
-                                                           dateutil.parser.parse('2008-08-01'),
-                                                           dateutil.parser.parse('2008-08-31'))
+                                                           dateutil.parser.parse('2008-06-01'),
+                                                           dateutil.parser.parse('2008-06-30'))
 
         self.assertIsNotNone(impact)
 
@@ -102,8 +102,8 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_remove_session(self):
         session = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
-                                                              dateutil.parser.parse('2008-09-01'),
-                                                              dateutil.parser.parse('2008-09-30'))
+                                                              dateutil.parser.parse('2008-10-01'),
+                                                              dateutil.parser.parse('2008-10-31'))
 
         self.test_client.sessions.remove(session.session_id)
 
@@ -117,8 +117,8 @@ class SessionIntegrationTests(unittest.TestCase):
     def test_create_session_no_data_error(self):
         try:
             self.test_client.sessions.create_forecast('does-not-exist', 'something',
-                                                      dateutil.parser.parse('2008-09-01'),
-                                                      dateutil.parser.parse('2008-09-30'))
+                                                      dateutil.parser.parse('2008-11-01'),
+                                                      dateutil.parser.parse('2008-11-30'))
         except ClientError as e:
             if e.status != 404:
                 self.assertFalse(True, 'Should have thrown 404 error.')

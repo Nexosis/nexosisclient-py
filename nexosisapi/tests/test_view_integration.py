@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import unittest
 from datetime import datetime
@@ -35,11 +36,11 @@ class ViewsIntegrationTests(unittest.TestCase):
 
     def tearDown(self):
         try:
+            self.test_client.views.remove("alpha-beta-mike")
             self.test_client.datasets.remove(self.ds_name)
             self.test_client.datasets.remove(self.ds_name_right)
-            self.test_client.views.remove("alpha-beta-mike")
-        except ClientError:
-            pass
+        except ClientError as error:
+            sys.stderr.write(error)
 
     def test_create_view(self):
         self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)

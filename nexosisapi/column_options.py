@@ -21,4 +21,4 @@ class ColumnOptions(object):
         return self._join_interval
 
     def __repr__(self):
-        return "ColumnOptions({'joinInterval': '%s'})" % self._join_interval
+        return "{'join_interval': '%s'}" % self._join_interval

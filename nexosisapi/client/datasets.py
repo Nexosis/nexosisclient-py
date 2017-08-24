@@ -102,9 +102,11 @@ class Datasets(object):
         :param datetime end_date: the ending date to remove from the dataset
         :param list cascade: set the cascade options of the removal.
 
-        The cascade list can contain 'forecast', 'session' or both.
-        When 'forecast' is included, all related forecasts will be removed.
-        When 'session' is include, all related sessions will be removed.
+        The cascade list can contain 'forecast', 'session', 'view' or any
+        combination of the three.
+        When 'forecast' is included, all related forecasts will also be removed.
+        When 'session' is included, all related sessions will also be removed.
+        When 'view' is included, all related views will also be removed.
         """
         if dataset_name is None:
             raise ValueError('dataset_name is required and was not provided')

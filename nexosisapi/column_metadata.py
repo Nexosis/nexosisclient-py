@@ -1,4 +1,5 @@
 import io
+import json
 from enum import Enum
 
 class ColumnType(Enum):
@@ -91,7 +92,7 @@ class ColumnMetadata(object):
         value = io.StringIO()
 
         value.write("ColumnMetadata({")
-        value.write("'type':%s" % self._data_type)
+        value.write("'dataType':%s" % self._data_type)
         value.write(", 'role':%s" % self._role)
         if self._aggregation is not None:
             value.write(", 'aggregation':%s" % self._aggregation)
