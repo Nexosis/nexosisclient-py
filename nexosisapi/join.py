@@ -6,10 +6,14 @@ class Join(object):
     def __init__(self, data_dict):
         if data_dict is None:
             data_dict = {}
+        
+        ds = data_dict.get('dataSet') or {}
+        cols = data_dict.get('columnOptions') or {}
+        joins = data_dict.get('joins') or []
 
-        self._dataset_name = data_dict.get('dataSet', {})['name']
-        self._column_options = {key: ColumnOptions(value) for (key, value) in data_dict.get('columnOptions', {}).items()}
-        self._joins = [Join(j) for j in data_dict.get('joins', [])]
+        self._dataset_name = ds['name']
+        self._column_options = {key: ColumnOptions(value) for (key, value) in cols.items()}
+        self._joins = [Join(j) for j in joins]
 
     @property
     def dataset_name(self):

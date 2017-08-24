@@ -37,33 +37,33 @@ class ViewsIntegrationTests(unittest.TestCase):
         try:
             self.test_client.datasets.remove(self.ds_name)
             self.test_client.datasets.remove(self.ds_name_right)
-            self.test_client.views.remove("mike")
+            self.test_client.views.remove("alpha-beta-mike")
         except ClientError:
             pass
 
     def test_create_view(self):
-        self.test_client.views.create('mike', self.ds_name, self.ds_name_right)
+        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
 
     def test_delete_view(self):
-        self.test_client.views.create('mike', self.ds_name, self.ds_name_right)
+        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
 
-        self.test_client.views.remove('mike')
+        self.test_client.views.remove('alpha-beta-mike')
 
         try:
-            self.test_client.views.get('mike')
+            self.test_client.views.get('alpha-beta-mike')
         except ClientError as error:
             self.assertEqual(404, error.status)
 
     def test_list_views(self):
-        self.test_client.views.create('mike', self.ds_name, self.ds_name_right)
+        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
 
-        views = self.test_client.views.list()
+        views = self.test_client.views.list(partial_name='alpha-beta-mike')
 
         self.assertEqual(1, len(views))
-        self.assertEqual('mike', views[0].view_name)
+        self.assertEqual('alpha-beta-mike', views[0].view_name)
 
     def test_get_view(self):
-        view_data = self.test_client.views.create('mike', self.ds_name, self.ds_name_right)
+        view_data = self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
 
-        self.assertEqual('mike', view_data.view_name)
+        self.assertEqual('alpha-beta-mike', view_data.view_name)
         self.assertEqual(self.ds_name, view_data.dataset_name)

@@ -4,7 +4,8 @@ from nexosisapi.column_metadata import ColumnMetadata
 class DatasetSummary(object):
     def __init__(self, data_dict):
         self._name = data_dict['dataSetName']
-        self._column_metadata = {key: ColumnMetadata(value) for key, value in data_dict.get('columns', {}).items()}
+        cols = data_dict.get('columns') or {}
+        self._column_metadata = {key: ColumnMetadata(value) for key, value in cols.items()}
 
     @property
     def name(self):
