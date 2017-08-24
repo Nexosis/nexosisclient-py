@@ -27,3 +27,10 @@ class Join(object):
         :rtype: list
         """
         return self._joins
+
+    def __repr__(self):
+        return """Join({
+    'dataSet': {'name': '%s'},
+    'columnOptions': %s,
+    'joins': %s
+})""" % (self.dataset_name, self.column_options, self.joins)

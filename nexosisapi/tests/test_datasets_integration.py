@@ -109,6 +109,13 @@ class DatasetsIntegrationTests(unittest.TestCase):
 
         self.assertListEqual(sorted(self.data, key=sorter), sorted(dataset.data, key=sorter))
 
+        self.assertEqual(dataset.metadata['observed'].data_type, ColumnType.numeric)
+        self.assertEqual(dataset.metadata['observed'].role, Role.target)
+        self.assertEqual(dataset.metadata['observed'].imputation, Imputation.zeroes)
+        self.assertEqual(dataset.metadata['observed'].aggregation, Aggregation.sum)
+        self.assertEqual(dataset.metadata['timestamp'].data_type, ColumnType.date)
+        self.assertEqual(dataset.metadata['timestamp'].role, Role.timestamp)
+
     def test_get_filtered(self):
         self.test_client.datasets.create(self.ds_name, self.data)
 

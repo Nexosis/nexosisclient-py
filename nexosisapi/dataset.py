@@ -11,15 +11,15 @@ class Dataset(object):
         if data_dict is None:
             data_dict = {}
         self._data = data_dict.get('data')
-        self._metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
+        self._metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('columns', {}).items()}
         self._links = data_dict.get('links')
 
     @property
     def data(self):
         """Gets the data for this Dataset.
 
-        :return: The data.
-        :rtype: list(dict)
+        :return: The data as a list of dict.
+        :rtype: list
         """
         return self._data
 
@@ -27,16 +27,23 @@ class Dataset(object):
     def metadata(self):
         """Gets the column metadata for this Dataset.
 
-        :return: The column metadata.
-        :rtype: list(ColumnMetadata)
+        :return: A list of :class:nexosisapi.ColumnMetadata.
+        :rtype: list
         """
-        return self._data
+        return self._metadata
 
     @property
     def links(self):
         """Gets the links for this Dataset.
 
-        :return: The links.
-        :rtype: list(dict)
+        :return: A list of dict where each dict contains a link
+        :rtype: list
         """
         return self._links
+
+    def __repr__(self):
+        return """Dataset({\n\
+    'metadata': %s,
+    'data': %s,
+    'links': %s
+})""" % (self._metadata, self._data, self._links)

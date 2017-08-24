@@ -13,3 +13,9 @@ class DatasetSummary(object):
     @property
     def column_metadata(self):
         return self._column_metadata
+
+    def __repr__(self):
+        return "Dataset({\n\
+    'dataSetName': %s\n\
+    'columns': %s,\n\
+})" % (self._name, self._column_metadata)

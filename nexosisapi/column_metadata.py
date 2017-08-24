@@ -1,5 +1,5 @@
+import io
 from enum import Enum
-
 
 class ColumnType(Enum):
     string = 0
@@ -86,3 +86,16 @@ class ColumnMetadata(object):
         :rtype: Aggregation
         """
         return self._aggregation
+
+    def __repr__(self):
+        value = io.StringIO()
+
+        value.write("ColumnMetadata({")
+        value.write("'type':%s" % self._data_type)
+        value.write(", 'role':%s" % self._role)
+        if self._aggregation is not None:
+            value.write(", 'aggregation':%s" % self._aggregation)
+        if self._imputation is not None:
+            value.write(", 'imputation':%s"  self._imputation)
+        value.write("})")
+        return value.getvalue()

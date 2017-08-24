@@ -49,6 +49,14 @@ class ViewDefinition(object):
         """
         return self._joins
 
+    def __repr__(self):
+        return """ViewDefinition({
+    'viewName': '%s',
+    'dataSetName': '%s',
+    'columns': %s,
+    'joins': %s
+})""" % (self._view_name, self._dataset_name, self._column_metadata, self._joins)
+
 
 class ViewData(ViewDefinition):
     """A view definition including the data associated with the view"""
@@ -68,3 +76,12 @@ class ViewData(ViewDefinition):
         :rtype: list
         """
         return self._data
+
+    def __repr__(self):
+        return """ViewData({
+    'viewName': '%s',
+    'dataSetName': '%s',
+    'columns': %s,
+    'joins': %s,
+    'data': %s
+})""" % (self._view_name, self._dataset_name, self._column_metadata, self._joins, self._data)
