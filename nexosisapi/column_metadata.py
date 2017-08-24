@@ -96,6 +96,6 @@ class ColumnMetadata(object):
         if self._aggregation is not None:
             value.write(", 'aggregation':%s" % self._aggregation)
         if self._imputation is not None:
-            value.write(", 'imputation':%s"  self._imputation)
+            value.write(", 'imputation':%s" % self._imputation)
         value.write("})")
         return value.getvalue()
