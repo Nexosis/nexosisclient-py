@@ -6,6 +6,7 @@ import requests
 from .sessions import Sessions
 from .imports import Imports
 from .datasets import Datasets
+from .views import Views
 from .http_client import HttpClient
 
 from nexosisapi import NEXOSIS_API_KEY
@@ -24,6 +25,7 @@ class Client(object):
         self._datasets = Datasets(self._client)
         self._imports = Imports(self._client)
         self._sessions = Sessions(self._client)
+        self._views = Views(self._client)
 
     @property
     def datasets(self):
@@ -37,6 +39,10 @@ class Client(object):
     def sessions(self):
         return self._sessions
 
+    @property
+    def views(self):
+        return self._views
+
     def get_account_balance(self):
         """get_account_balance"""
         response, status, headers = self._client.request_with_headers('GET', 'data')
@@ -47,4 +53,3 @@ class Client(object):
                 return float(value)
 
         response.raise_for_status()
-

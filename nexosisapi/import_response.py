@@ -11,6 +11,9 @@ class ImportType(Enum):
 
 class ImportResponse(object):
     def __init__(self, data_dict=None):
+        if data_dict is None:
+            data_dict = {}
+
         self._import_id = data_dict['importId']
         self._type = ImportType[data_dict['type']]
         self._status = Status[data_dict['status']]
@@ -20,7 +23,8 @@ class ImportResponse(object):
         self._links = data_dict['links']
         self._parameters = data_dict['parameters']
         self._messages = data_dict['messages']
-        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
+        md =  data_dict.get('metadata') or {}
+        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in md.items()}
 
     @property
     def import_id(self):

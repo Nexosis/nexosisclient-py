@@ -50,12 +50,12 @@ class Datasets(object):
         listing = self._client.request('GET', '/data', params={'partialName': partial_name})
         return [DatasetSummary(item) for item in listing.get('items', [])]
 
-    def get(self, dataset_name, page_number=0, page_size=1000, start_date=None, end_date=None, include=None):
+    def get(self, dataset_name, page_number=0, page_size=50, start_date=None, end_date=None, include=None):
         """Get the data stored in a data set
 
         :param str dataset_name: name of the dataset
         :param int page_number: zero-based page number of results to retrieve
-        :param int page_size: count of results to retrieve in each page (default 1000, max 1000).
+        :param int page_size: count of results to retrieve in each page (default 50, max 1000).
         :param datetime start_date: the first date to return in the response
         :param datetime end_date: the last date to return in the response
         :param include: string or array of strings specifying the names of the columns from the dataset to return
@@ -71,14 +71,14 @@ class Datasets(object):
 
         return Dataset(dataset)
 
-    def get_csv(self, dataset_name, csv_file, page_number=0, page_size=1000, start_date=None, end_date=None,
+    def get_csv(self, dataset_name, csv_file, page_number=0, page_size=50, start_date=None, end_date=None,
                 include=None):
         """Get the data stored in a data set, and write it to a file
 
         :param str dataset_name: name of the dataset
         :param FileIO csv_file: an open, writeable text file to save the data to
         :param int page_number: zero-based page number of results to retrieve
-        :param int page_size: count of results to retrieve in each page (default 1000, max 1000).
+        :param int page_size: count of results to retrieve in each page (default 50, max 1000).
         :param datetime start_date: the first date to return in the response
         :param datetime end_date: the last date to return in the response
         :param include: string or array of strings specifying the names of the columns from the dataset to return
@@ -102,9 +102,11 @@ class Datasets(object):
         :param datetime end_date: the ending date to remove from the dataset
         :param list cascade: set the cascade options of the removal.
 
-        The cascade list can contain 'forecast', 'session' or both.
-        When 'forecast' is included, all related forecasts will be removed.
-        When 'session' is include, all related sessions will be removed.
+        The cascade list can contain 'forecast', 'session', 'view' or any
+        combination of the three.
+        When 'forecast' is included, all related forecasts will also be removed.
+        When 'session' is included, all related sessions will also be removed.
+        When 'view' is included, all related views will also be removed.
         """
         if dataset_name is None:
             raise ValueError('dataset_name is required and was not provided')

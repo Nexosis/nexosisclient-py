@@ -102,3 +102,5 @@ ENV/
 .idea/
 
 .setenv
+
+.vscode/

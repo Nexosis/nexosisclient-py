@@ -3,7 +3,6 @@ import tempfile
 import unittest
 from datetime import datetime
 import csv
-import json
 
 from nexosisapi import Client, ClientError
 from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role, Imputation, Aggregation
@@ -73,7 +72,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         # more data added, items 10-end
         self.test_client.datasets.create(self.ds_name, self.data[10:])
 
-        result = self.test_client.datasets.get(self.ds_name)
+        result = self.test_client.datasets.get(self.ds_name, page_size=1000)
 
         # make sure the saved data has extended the initial data upload to the full data set
         self.assertEqual(len(self.data), len(result.data))
@@ -84,7 +83,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
 
         self.assertEqual(self.ds_name, result.name)
 
-        check = self.test_client.datasets.get(self.ds_name)
+        check = self.test_client.datasets.get(self.ds_name, page_size=1000)
         self.assertEqual(len(self.data), len(check.data))
 
     def test_list_datasets(self):
@@ -104,11 +103,18 @@ class DatasetsIntegrationTests(unittest.TestCase):
     def test_get(self):
         self.test_client.datasets.create(self.ds_name, self.data)
 
-        dataset = self.test_client.datasets.get(self.ds_name)
+        dataset = self.test_client.datasets.get(self.ds_name, page_size=1000)
 
         def sorter(d): return d['timestamp']
 
         self.assertListEqual(sorted(self.data, key=sorter), sorted(dataset.data, key=sorter))
+
+        self.assertEqual(dataset.metadata['observed'].data_type, ColumnType.numeric)
+        self.assertEqual(dataset.metadata['observed'].role, Role.target)
+        self.assertEqual(dataset.metadata['observed'].imputation, Imputation.zeroes)
+        self.assertEqual(dataset.metadata['observed'].aggregation, Aggregation.sum)
+        self.assertEqual(dataset.metadata['timestamp'].data_type, ColumnType.date)
+        self.assertEqual(dataset.metadata['timestamp'].role, Role.timestamp)
 
     def test_get_filtered(self):
         self.test_client.datasets.create(self.ds_name, self.data)
@@ -126,7 +132,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
                                  '%s%s.tmp' % (tempfile.gettempprefix(), datetime.now().strftime('%f')))
 
         with open(temp_file, 'wb') as f:
-            self.test_client.datasets.get_csv(self.ds_name, f)
+            self.test_client.datasets.get_csv(self.ds_name, f, page_size=1000)
 
         with open(temp_file, 'r') as f:
             # the +1 is for the headers written to the file
@@ -151,5 +157,5 @@ class DatasetsIntegrationTests(unittest.TestCase):
 
         self.test_client.datasets.remove(self.ds_name, end_date=datetime.strptime('2008-06-30', '%Y-%m-%d'))
 
-        partial = self.test_client.datasets.get(self.ds_name)
+        partial = self.test_client.datasets.get(self.ds_name, page_size=1000)
         self.assertEqual(len(self.data) - 30, len(partial.data))
