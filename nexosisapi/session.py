@@ -33,7 +33,8 @@ class Session(object):
         self._result_interval = TimeInterval[data_dict['resultInterval']] \
             if 'resultInterval' in data_dict.keys() and data_dict['resultInterval'] \
             else TimeInterval.day
-        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in data_dict.get('metadata', {}).items()}
+        md = data_dict.get('metadata') or {}
+        self._column_metadata = {key: ColumnMetadata(value) for (key, value) in md.items()}
 
     @property
     def session_id(self):
@@ -91,6 +92,27 @@ class Session(object):
     def extra_parameters(self):
         return self._extra_parameters
 
+    def __repr__(self):
+        return """Session({
+    'sessionId': '%s',
+    'type': '%s',
+    'status': '%s',
+    'statusHistory': %s,
+    'dataSetName': '%s',
+    'targetColumn': '%s',
+    'startDate': '%s',
+    'endDate': '%s',
+    'resultInterval': '%s',
+    'metadata': %s
+    'requestedDate': '%s',
+    'isEstimate': %s,
+    'extraParameters': %s,
+    'links': %s
+})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
+            self._target_column, self._start_date, self._end_date, self._result_interval.name,
+            self._column_metadata, self._requested_date, self._is_estimate,
+            self._extra_parameters, self._links)
+
 
 class SessionResponse(Session):
     def __init__(self, data_dict, headers):
@@ -121,3 +143,27 @@ class SessionResult(Session):
     @property
     def data(self):
         return self._data
+
+    def __repr__(self):
+        return """SessionResult({
+    'sessionId': '%s',
+    'type': '%s',
+    'status': '%s',
+    'statusHistory': %s,
+    'dataSetName': '%s',
+    'targetColumn': '%s',
+    'startDate': '%s',
+    'endDate': '%s',
+    'resultInterval': '%s',
+    'metadata': %s
+    'requestedDate': '%s',
+    'isEstimate': %s,
+    'extraParameters': %s,
+    'links': %s,
+    'metrics': %s,
+    'data': %s
+})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
+            self._target_column, self._start_date, self._end_date, self._result_interval.name,
+            self._column_metadata, self._requested_date, self._is_estimate,
+            self._extra_parameters, self._links, self._metrics, self._data)
+

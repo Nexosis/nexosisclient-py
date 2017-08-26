@@ -1,6 +1,6 @@
 import io
-import json
 from enum import Enum
+
 
 class ColumnType(Enum):
     string = 0
@@ -92,11 +92,11 @@ class ColumnMetadata(object):
         value = io.StringIO()
 
         value.write("ColumnMetadata({")
-        value.write("'dataType':%s" % self._data_type)
-        value.write(", 'role':%s" % self._role)
+        value.write("'dataType': '%s'" % self._data_type.name)
+        value.write(", 'role': '%s'" % self._role.name)
         if self._aggregation is not None:
-            value.write(", 'aggregation':%s" % self._aggregation)
+            value.write(", 'aggregation': '%s'" % self._aggregation.name)
         if self._imputation is not None:
-            value.write(", 'imputation':%s" % self._imputation)
+            value.write(", 'imputation': '%s'" % self._imputation.name)
         value.write("})")
         return value.getvalue()

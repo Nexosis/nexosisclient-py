@@ -7,7 +7,8 @@ class ColumnOptions(object):
         if data_dict is None:
             data_dict = {}
 
-        self._join_interval = TimeInterval(data_dict['joinInterval'])
+        self._join_interval = TimeInterval[data_dict.get('joinInterval') or 'day']
+        self._alias = data_dict.get('alias')
 
     @property
     def join_interval(self):
@@ -20,5 +21,15 @@ class ColumnOptions(object):
         """
         return self._join_interval
 
+    @property
+    def alias(self):
+        """Optional alias for the column
+
+           :return: the aliased name of the column
+           :rtype: string
+        """
+        return self._join_interval
+
+
     def __repr__(self):
-        return "{'join_interval': '%s'}" % self._join_interval
+        return "{'join_interval': '%s', 'alias': '%s'}" % (self._join_interval.name, self._alias)
