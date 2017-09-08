@@ -6,6 +6,7 @@ from datetime import datetime
 import csv
 
 from nexosisapi import Client, ClientError
+from nexosisapi.view_definition import ViewDefinition
 
 class ViewsIntegrationTests(unittest.TestCase):
     def setUp(self):
@@ -68,3 +69,7 @@ class ViewsIntegrationTests(unittest.TestCase):
 
         self.assertEqual('alpha-beta-mike', view_data.view_name)
         self.assertEqual(self.ds_name, view_data.dataset_name)
+
+    def test_add_with_calendar(self):
+        view_def = ViewDefinition({'viewName': 'testPyView', 'dataSetName': self.ds_name, 'joins': []})
+        self.test_client.views.create_by_definition(view_def)

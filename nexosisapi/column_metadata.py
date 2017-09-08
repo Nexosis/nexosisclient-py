@@ -22,6 +22,8 @@ class Imputation(Enum):
     mean = 1
     median = 2
     mode = 3
+    min = 4
+    max = 5
 
 
 class Aggregation(Enum):
@@ -29,6 +31,8 @@ class Aggregation(Enum):
     mean = 1
     median = 2
     mode = 3
+    min = 4
+    max = 5
 
 
 class ColumnMetadata(object):
