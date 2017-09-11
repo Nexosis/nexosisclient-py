@@ -6,6 +6,8 @@ from datetime import datetime
 import csv
 
 from nexosisapi import Client, ClientError
+from nexosisapi.view_definition import ViewDefinition
+from nexosisapi.calendar_join import CalendarJoin
 
 class ViewsIntegrationTests(unittest.TestCase):
     def setUp(self):
@@ -37,7 +39,7 @@ class ViewsIntegrationTests(unittest.TestCase):
     def tearDown(self):
         try:
             self.test_client.views.remove("alpha-beta-mike")
-            self.test_client.datasets.remove(self.ds_name)
+            self.test_client.datasets.remove(self.ds_name, cascade="view")
             self.test_client.datasets.remove(self.ds_name_right)
         except ClientError as error:
             sys.stderr.write(error)
@@ -68,3 +70,17 @@ class ViewsIntegrationTests(unittest.TestCase):
 
         self.assertEqual('alpha-beta-mike', view_data.view_name)
         self.assertEqual(self.ds_name, view_data.dataset_name)
+
+    def test_add_with_named_calendar(self):
+        view_def = ViewDefinition({'viewName': 'testPyView', 'dataSetName': self.ds_name, 'joins': [{'calendar': {'name': 'Nexosis.Holidays-US'}}]})
+        created_view = self.test_client.views.create_by_definition(view_def)
+        self.assertIsNotNone(created_view)
+        self.assertIsInstance(created_view.joins[0].join_target, CalendarJoin)
+
+    def test_add_with_url_calendar(self):
+        iCal_url = 'https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics'
+        view_def = ViewDefinition({'viewName': 'testPyViewiCal', 'dataSetName': self.ds_name,
+                                   'joins': [{'calendar': {'url': iCal_url}}]})
+        created_view = self.test_client.views.create_by_definition(view_def)
+        self.assertIsNotNone(created_view)
+        self.assertEqual(iCal_url,created_view.joins[0].join_target.url)

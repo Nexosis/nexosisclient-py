@@ -44,11 +44,7 @@ def _json_encode(obj):
             'joins': obj.joins
         }
     if isinstance(obj, Join):
-        return {
-            'dataSet': {'name': obj.dataset_name},
-            'columnOptions': obj.column_options,
-            'joins': obj.joins
-        }
+        return obj.to_hash()
     if isinstance(obj, ColumnOptions):
         return {
             'joinInterval': obj.join_interval
