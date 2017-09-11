@@ -23,5 +23,5 @@ class ViewModelUnitTests(unittest.TestCase):
 
     def test_cal_with_tz_outputs_json(self):
         tz_join_def = Join({'calendar': {'name': 'TestCalendar', 'timeZone': 'Americas/New_York'}})
-        actual = json.dumps(tz_join_def.to_hash())
+        actual = json.dumps(tz_join_def.to_hash(), sort_keys=True)
         self.assertEqual('{"calendar": {"name": "TestCalendar", "timeZone": "Americas/New_York"}}', actual)
