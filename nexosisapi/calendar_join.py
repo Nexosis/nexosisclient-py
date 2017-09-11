@@ -28,3 +28,4 @@ class CalendarJoin(object):
             obj_hash['name'] = self.name
         if self.time_zone is not None:
             obj_hash['timeZone'] = self.time_zone
+        return obj_hash
