@@ -13,8 +13,8 @@ class Sessions(object):
                         callback_url=None):
         if datasource_name is None:
             raise ValueError('datasource_name is required and was not provided')
-        if target_column is None:
-            raise ValueError('target_column is required and was not provided')
+        if not (target_column is None or column_metadata is None):
+            raise ValueError('target_column or column_metadata is required and was not provided')
         if start_date is None:
             raise ValueError('start_date is required and was not provided')
         if end_date is None:
@@ -52,6 +52,24 @@ class Sessions(object):
         """
         response, _, headers = self._create_session(datasource_name, 'forecast', target_column, None, start_date, end_date,
                                                     result_interval, callback_url=callback_url)
+        return SessionResponse(response, headers)
+
+    def create_forecast_with_metadata(self, datasource_name, column_metadata, start_date, end_date, result_interval=TimeInterval.day, callback_url=None):
+        """Create a new forecast for a datasource
+
+        :param str datasource_name: the name of the data source to forecast on
+        :param dict column_metadata: the metadata describing the columns to include in the session
+        :param datetime start_date: the first datetime of the forecast
+        :param datetime end_date: the last datetime of the forecast
+        :param TimeInterval result_interval: the interval between predictions in the results
+        :param str callback_url: the url to callback to on session status change events
+
+        :return the session description
+        :rtype: SessionResponse
+        """
+        response, _, headers = self._create_session(datasource_name, 'forecast', None, None, start_date, end_date, 
+            result_interval, is_estimate=False, column_metadata=column_metadata, callback_url=None)
+
         return SessionResponse(response, headers)
 
     def analyze_impact(self, datasource_name, target_column, event_name, start_date, end_date,
@@ -107,19 +125,34 @@ class Sessions(object):
                                                     end_date, result_interval, is_estimate=True)
         return SessionResponse(response, headers)
 
-    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None):
-        """list the created sessions, optionally filtering on session parameters
+    def build_regression_model(self, datasource_name, target_column, column_metadata, is_estimate=False, callback_url=None):
+        return self._client.request_with_headers('POST', 'sessions/model',
+                                                 data={
+                                                     'predictionDomain': 'regression',
+                                                     'dataSourceName': datasource_name,
+                                                     'targetColumn': target_column,
+                                                     'columns': column_metadata,
+                                                     'isEstimate': is_estimate,
+                                                     'callbackUrl': ''
+                                                 })
 
-        :param str datasource_name: the name of the data source to forecast on
+    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None, page_number=0, page_size=50, ):
+        """Get a list of all sessions, optionally filtering on session parameters
+
+        :param str datasource_name: the name of the data source the session is related to
         :param str event_name: filter on the event name given when running an impact analysis
-        :param datetime requested_before: only include sessions created before this date
-        :param datetime requested_after: only include sessions created after this date
+        :param datetime requested_before: only include sessions requested before this date
+        :param datetime requested_after: only include sessions requested after this date
         :param SessionType session_type: filter on the type of session
+        :param int page_number: zero-based page number of results to retrieve
+        :param int page_size: count of results to retrieve in each page (default 50, max 1000).
 
-        :returns a list of :class:`SessionResponses`
+        :returns a list of `SessionResponse`
         :rtype list
         """
         query = {
+            'page': page_number,
+            'pageSize': page_size,
             'dataSourceName': datasource_name,
             'eventName': event_name,
             'requestedBefore': requested_before,

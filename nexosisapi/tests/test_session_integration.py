@@ -5,6 +5,8 @@ import os
 import dateutil.parser
 import unittest
 
+from nexosisapi.column_metadata import ColumnMetadata
+
 from nexosisapi import Client, ClientError
 from nexosisapi.session import SessionType
 from nexosisapi.status import Status
@@ -12,21 +14,28 @@ from nexosisapi.status import Status
 
 class SessionIntegrationTests(unittest.TestCase):
     def setUp(self):
+        def build_test_dataset(file, dataset_name):
+            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file)) as f:
+                csv_data = csv.DictReader(f)
+                data = [dict(d) for d in csv_data]
+            try:
+                self.test_client.datasets.get(dataset_name)
+            except ClientError as e:
+                if e.status == 404:
+                    self.test_client.datasets.create(dataset_name, data)
+                else:
+                    raise
+            return data
+
         self.forecast = None
         self.impact = None
-        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
-        self.ds_name = "data-sessions-integration"
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
-            csv_data = csv.DictReader(f)
-            self.data = [dict(d) for d in csv_data]
+        #self.test_client = Client(key=os.environ['NEXOSIS_API_TESTKEY'], uri=os.environ['NEXOSIS_API_TESTURI'])
+        self.test_client = Client(key='720a099f4f7a46e1ad739109598ba484', uri='https://api.dev.nexosisdev.com/internal/')
+        self.ds_name = 'data-sessions-integration'
+        self.regression_ds_name = 'data-regression-integration'
 
-        try:
-            self.test_client.datasets.get(self.ds_name)
-        except ClientError as e:
-            if e.status == 404:
-                self.test_client.datasets.create(self.ds_name, self.data)
-            else:
-                raise
+        self.data = build_test_dataset('data/data.csv', self.ds_name)
+        self.regression_data = build_test_dataset('data/regression-data.csv', self.regression_ds_name)
 
         self._setup_sessions()
 
@@ -131,6 +140,19 @@ class SessionIntegrationTests(unittest.TestCase):
         except ClientError as e:
             if e.status != 400:
                 self.assertFalse(True, 'Should have thrown 400 error.')
+
+    def test_create_regression_model(self):
+        columns = {
+            'R.D.Spend': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'Administration': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'Marketing.Spend': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'Profit': ColumnMetadata({'dataType': 'numeric', 'role': 'target'}),
+            'ny': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
+            'florida': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
+            'cali': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
+        }
+        results = self.test_client.sessions.build_regression_model(self.regression_ds_name, 'profit', columns)
+
 
     def _setup_sessions(self):
         # check if we have a session data for forecast and impact, and if not, kick them off

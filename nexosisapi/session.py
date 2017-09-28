@@ -10,7 +10,8 @@ from nexosisapi.time_interval import TimeInterval
 class SessionType(Enum):
     import_ = 0,
     forecast = 1,
-    impact = 2
+    impact = 2,
+    model = 3
 
 
 class Session(object):

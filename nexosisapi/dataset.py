@@ -27,7 +27,7 @@ class Dataset(object):
     def metadata(self):
         """Gets the column metadata for this Dataset.
 
-        :return: A list of :class:nexosisapi.ColumnMetadata.
+        :return: A list of ColumnMetadata.
         :rtype: list
         """
         return self._metadata
