@@ -21,7 +21,7 @@ class Client(object):
         self._uri = uri
 
         if client is None:
-            client = HttpClient(key, uri)
+            client = HttpClient(self._key, uri)
         self._client = client
         self._models = Models(self._client)
         self._datasets = Datasets(self._client)
