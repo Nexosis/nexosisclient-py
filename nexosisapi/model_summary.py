@@ -44,6 +44,17 @@ class ModelSummary(object):
     def metrics(self):
         return self._metrics
 
+    def __repr__(self):
+        return """PredictResults({'modelId': '%s', 'predictionDomain': '%s', 'dataSourceName': '%s', 'createdOn': '%s', 'algorithm': '%s', 'columnMetadata': %s, 'metrics': %s}""" % (
+            self._model_id,
+            self._prediction_domain,
+            self._datasource_name,
+            self._created_on,
+            self._algorithm,
+            self._column_metadata,
+            self._metrics
+        )
+
 
 class PredictResults(ModelSummary):
     def __init__(self, data_dict=None):
@@ -57,3 +68,17 @@ class PredictResults(ModelSummary):
     @property
     def data(self):
         return self._data
+
+    def __repr__(self):
+        return """PredictResults({'modelId': '%s', 'predictionDomain': '%s', 'dataSourceName': '%s', 'createdOn': '%s', 'algorithm': '%s', 'columnMetadata': %s, 'metrics': %s
+            data: %s}""" % (
+            self._model_id,
+            self._prediction_domain,
+            self._datasource_name,
+            self._created_on,
+            self._algorithm,
+            self._column_metadata,
+            self._metrics,
+            self._data
+        )
+

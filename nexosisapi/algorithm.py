@@ -19,3 +19,6 @@ class Algorithm(object):
     @property
     def key(self):
         return self._key
+
+    def __repr__(self):
+        return "Algorithm({'key': %s, 'name': %s, 'description': %s}" % (self._key, self._name, self._desc)

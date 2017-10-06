@@ -15,6 +15,7 @@ class Role(Enum):
     timestamp = 1
     target = 2
     feature = 3
+    key = 4
 
 
 class Imputation(Enum):

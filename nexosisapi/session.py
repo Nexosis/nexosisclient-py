@@ -25,8 +25,18 @@ class Session(object):
         self._status_history = data_dict['statusHistory']
         self._dataset_name = data_dict['dataSetName']
         self._target_column = data_dict['targetColumn']
-        self._start_date = dateutil.parser.parse(data_dict['startDate'])
-        self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        if 'modelId' in data_dict:
+            self._model_id = data_dict['modelId']
+        else:
+            self._model_id = None
+        if 'startDate' in data_dict:
+            self._start_date = dateutil.parser.parse(data_dict['startDate'])
+        else:
+            self._start_date = None
+        if 'endDate' in data_dict:
+            self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        else:
+            self._end_date = None
         self._requested_date = dateutil.parser.parse(data_dict['requestedDate'])
         self._links = data_dict['links']
         self._is_estimate = bool(data_dict['isEstimate'])
@@ -60,6 +70,10 @@ class Session(object):
     @property
     def target_column(self):
         return self._target_column
+
+    @property
+    def model_id(self):
+        return self._model_id
 
     @property
     def start_date(self):
@@ -101,6 +115,7 @@ class Session(object):
     'statusHistory': %s,
     'dataSetName': '%s',
     'targetColumn': '%s',
+    'modelId': '%s',
     'startDate': '%s',
     'endDate': '%s',
     'resultInterval': '%s',
@@ -110,7 +125,7 @@ class Session(object):
     'extraParameters': %s,
     'links': %s
 })""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
-            self._target_column, self._start_date, self._end_date, self._result_interval.name,
+            self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
             self._column_metadata, self._requested_date, self._is_estimate,
             self._extra_parameters, self._links)
 
@@ -153,6 +168,7 @@ class SessionResult(Session):
     'statusHistory': %s,
     'dataSetName': '%s',
     'targetColumn': '%s',
+    'modelId': '%s',
     'startDate': '%s',
     'endDate': '%s',
     'resultInterval': '%s',
@@ -164,7 +180,7 @@ class SessionResult(Session):
     'metrics': %s,
     'data': %s
 })""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
-            self._target_column, self._start_date, self._end_date, self._result_interval.name,
+            self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
             self._column_metadata, self._requested_date, self._is_estimate,
             self._extra_parameters, self._links, self._metrics, self._data)
 

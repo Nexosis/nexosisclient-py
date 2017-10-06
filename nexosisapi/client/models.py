@@ -35,7 +35,7 @@ class Models(object):
         if model_id is None:
             raise ValueError('model_id is required and was not provided')
 
-        response = self._client.request('GET', 'models', params={'modelId': model_id})
+        response = self._client.request('GET', 'models/%s' % model_id)
         return ModelSummary(response)
 
     def predict(self, model_id, features):
@@ -48,7 +48,7 @@ class Models(object):
         if model_id is None:
             raise ValueError('model_id is required and was not provided')
 
-        response = self._client.request('POST', params={'modelId': model_id}, data={'data': features})
+        response = self._client.request('POST', 'models/%s/predict' % model_id, data={'data': features})
 
         return PredictResults(response)
 

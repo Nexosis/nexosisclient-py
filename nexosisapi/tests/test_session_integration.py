@@ -29,8 +29,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
         self.forecast = None
         self.impact = None
-        #self.test_client = Client(key=os.environ['NEXOSIS_API_TESTKEY'], uri=os.environ['NEXOSIS_API_TESTURI'])
-        self.test_client = Client(key='720a099f4f7a46e1ad739109598ba484', uri='https://api.dev.nexosisdev.com/internal/')
+        self.test_client = Client(key=os.environ['NEXOSIS_API_TESTKEY'], uri=os.environ['NEXOSIS_API_TESTURI'])
         self.ds_name = 'data-sessions-integration'
         self.regression_ds_name = 'data-regression-integration'
 
@@ -151,7 +150,7 @@ class SessionIntegrationTests(unittest.TestCase):
             'florida': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
             'cali': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
         }
-        results = self.test_client.sessions.build_regression_model(self.regression_ds_name, 'profit', columns)
+        results = self.test_client.sessions.train_regression_model(self.regression_ds_name, 'profit', columns)
 
 
     def _setup_sessions(self):
