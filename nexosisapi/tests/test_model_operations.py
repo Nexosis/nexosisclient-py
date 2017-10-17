@@ -1,5 +1,5 @@
 import unittest
-from .fake_http_client import FakeHttpClient
+from nexosisapi.tests.fake_http_client import FakeHttpClient
 from nexosisapi import Client
 
 
