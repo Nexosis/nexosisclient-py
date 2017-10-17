@@ -118,7 +118,7 @@ class Sessions(object):
         return SessionResponse(response, headers)
 
     def train_regression_model(self, datasource_name, target_column=None, column_metadata=None, is_estimate=False, callback_url=None):
-        """Train a model for use in regression predictions
+        """Train a model for use in regression analysis
 
         :param str datasource_name: the name of the data source to forecast on
         :param str target_column: the column from the data source that will be requested in predictions
@@ -141,7 +141,7 @@ class Sessions(object):
 
         return SessionResponse(response, headers)
 
-    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None, page_number=0, page_size=50, ):
+    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None, page_number=0, page_size=50):
         """Get a list of all sessions, optionally filtering on session parameters
 
         :param str datasource_name: the name of the data source the session is related to
