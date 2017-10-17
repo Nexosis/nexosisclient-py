@@ -24,5 +24,4 @@ class ModelIntegrationTests(unittest.TestCase):
 
     def test_run_predict(self):
         results = self.test_client.models.predict(self.test_model.model_id, self.predict_data)
-        print(results)
         self.assertEqual(4, len(results.data))

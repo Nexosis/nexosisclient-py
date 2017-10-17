@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 from datetime import datetime
+
 import csv
 
 from nexosisapi import Client, ClientError
@@ -53,7 +54,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(metadata['timestamp'].role, result.column_metadata['timestamp'].role)
 
     def test_create_assign_imputation_aggregation(self):
-        metadata = {'observed': ColumnMetadata({'dataType': 'numeric', 'role': 'target', 'imputation' : 'mode', 'aggregation' : 'median'}),
+        metadata = {'observed': ColumnMetadata({'dataType': 'numeric', 'role': 'target', 'imputation': 'mode', 'aggregation': 'median'}),
                     'timestamp': ColumnMetadata({'dataType': 'date', 'role': 'timestamp'})}
 
         result = self.test_client.datasets.create(self.ds_name, self.data, metadata)
@@ -61,7 +62,6 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(self.ds_name, result.name)
         self.assertEqual(Aggregation.median, result.column_metadata['observed'].aggregation)
         self.assertEqual(Imputation.mode, result.column_metadata['observed'].imputation)
-
 
     def test_create_adding_data_adds_more_data(self):
         # initial data added, items 0-9
@@ -104,10 +104,6 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.test_client.datasets.create(self.ds_name, self.data)
 
         dataset = self.test_client.datasets.get(self.ds_name, page_size=1000)
-
-        def sorter(d): return d['timestamp']
-
-        self.assertListEqual(sorted(self.data, key=sorter), sorted(dataset.data, key=sorter))
 
         self.assertEqual(dataset.metadata['observed'].data_type, ColumnType.numeric)
         self.assertEqual(dataset.metadata['observed'].role, Role.target)
