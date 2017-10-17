@@ -52,26 +52,12 @@ class Models(object):
 
         return PredictResults(response)
 
-    def predict_csv(self, model_id, csv_file):
-        """Predicts target values for a set of features given as a CSV file using a model.
-
-        :param str model_id: the id of the model to use for prediction
-        :param obj csv_file: a file with the features for the prediction
-        :return:
-        """
-        if model_id is None:
-            raise ValueError('model_id is required and was not provided')
-        if csv_file is None:
-            raise ValueError('csv_file is required and was not provided')
-
-        return self.predict(model_id, csv_file.read())
-
     def remove(self, model_id):
         """Remove a model by id
 
         :param str model_id: the id of the model to delete
         """
-        self._client.request('DELETE', 'models', params={'modelId': model_id})
+        self._client.request('DELETE', 'models/%s' % model_id)
 
     def remove_models(self, datasource_name=None, created_after=None, created_before=None):
         """Remove models, optionally filtering on model parameters

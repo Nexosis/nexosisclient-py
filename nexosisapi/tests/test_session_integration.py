@@ -29,7 +29,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
         self.forecast = None
         self.impact = None
-        self.test_client = Client(key=os.environ['NEXOSIS_API_TESTKEY'], uri=os.environ['NEXOSIS_API_TESTURI'])
+        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
         self.ds_name = 'data-sessions-integration'
         self.regression_ds_name = 'data-regression-integration'
 
