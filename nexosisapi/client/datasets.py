@@ -11,11 +11,11 @@ class Datasets(object):
         """Save data in a named dataset
 
         :param str dataset_name: the name of the dataset
-        :param list data: a :class:`list` of :class:`dict` where each dict is the set of values in the data set.
-        :param dict metadata: a dict of `str` keys to :class:`ColumnMetadata` items where the string key matches one
+        :param list data: a `list` of `dict` where each dict is the set of values in the data set.
+        :param dict metadata: a dict of `str` keys to `ColumnMetadata` items where the string key matches one
             of the keys from the entries in the data dicts
 
-        :return: a :class:`DatasetSummary` describing the dataset
+        :return: a `DatasetSummary` describing the dataset
         :rtype: DatasetSummary
         """
         return self._create(dataset_name, {'data': data, 'columns': metadata}, 'application/json')
@@ -26,7 +26,7 @@ class Datasets(object):
         :param str dataset_name: the name of the dataset
         :param file csv_file: an open file to read the csv data from
 
-        :return: a :class:`DatasetSummary` describing the dataset
+        :return: a `DatasetSummary` describing the dataset
         :rtype: DatasetSummary
         """
         return self._create(dataset_name, csv_file.read(), 'text/csv')
@@ -44,7 +44,7 @@ class Datasets(object):
         """Get the list of saved datasets, optionally filtering by name
 
         :param str partial_name:
-        :return: a :class:`list` of DatasetSummary objects representing the dataset stored
+        :return: a `list` of DatasetSummary objects representing the dataset stored
         :rtype: list
         """
         listing = self._client.request('GET', '/data', params={'partialName': partial_name})
@@ -59,7 +59,7 @@ class Datasets(object):
         :param datetime start_date: the first date to return in the response
         :param datetime end_date: the last date to return in the response
         :param include: string or array of strings specifying the names of the columns from the dataset to return
-        :return: a :class:`Dataset` with the data queried
+        :return: a `Dataset` with the data queried
         :rtype: Dataset
         """
         if dataset_name is None:

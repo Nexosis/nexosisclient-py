@@ -10,7 +10,8 @@ from nexosisapi.time_interval import TimeInterval
 class SessionType(Enum):
     import_ = 0,
     forecast = 1,
-    impact = 2
+    impact = 2,
+    model = 3
 
 
 class Session(object):
@@ -24,15 +25,26 @@ class Session(object):
         self._status_history = data_dict['statusHistory']
         self._dataset_name = data_dict['dataSetName']
         self._target_column = data_dict['targetColumn']
-        self._start_date = dateutil.parser.parse(data_dict['startDate'])
-        self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        if 'modelId' in data_dict:
+            self._model_id = data_dict['modelId']
+        else:
+            self._model_id = None
+        if 'startDate' in data_dict:
+            self._start_date = dateutil.parser.parse(data_dict['startDate'])
+        else:
+            self._start_date = None
+        if 'endDate' in data_dict:
+            self._end_date = dateutil.parser.parse(data_dict['endDate'])
+        else:
+            self._end_date = None
         self._requested_date = dateutil.parser.parse(data_dict['requestedDate'])
         self._links = data_dict['links']
         self._is_estimate = bool(data_dict['isEstimate'])
         self._extra_parameters = data_dict['extraParameters']
         self._result_interval = TimeInterval[data_dict['resultInterval']] \
-            if 'resultInterval' in data_dict.keys() and data_dict['resultInterval'] \
+            if 'resultInterval' in data_dict and data_dict['resultInterval'] \
             else TimeInterval.day
+        self._available_prediction_intervals = data_dict.get('availablePredictionIntervals')
         md = data_dict.get('metadata') or {}
         self._column_metadata = {key: ColumnMetadata(value) for (key, value) in md.items()}
 
@@ -59,6 +71,10 @@ class Session(object):
     @property
     def target_column(self):
         return self._target_column
+
+    @property
+    def model_id(self):
+        return self._model_id
 
     @property
     def start_date(self):
@@ -89,6 +105,10 @@ class Session(object):
         return self._column_metadata
 
     @property
+    def available_prediction_intervals(self):
+        return self._available_prediction_intervals
+
+    @property
     def extra_parameters(self):
         return self._extra_parameters
 
@@ -100,17 +120,19 @@ class Session(object):
     'statusHistory': %s,
     'dataSetName': '%s',
     'targetColumn': '%s',
+    'modelId': '%s',
     'startDate': '%s',
     'endDate': '%s',
     'resultInterval': '%s',
     'metadata': %s
     'requestedDate': '%s',
     'isEstimate': %s,
+    'availablePredictionIntervals': '%s',
     'extraParameters': %s,
     'links': %s
 })""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
-            self._target_column, self._start_date, self._end_date, self._result_interval.name,
-            self._column_metadata, self._requested_date, self._is_estimate,
+            self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
+            self._column_metadata, self._requested_date, self._is_estimate, self._available_prediction_intervals,
             self._extra_parameters, self._links)
 
 
@@ -152,6 +174,7 @@ class SessionResult(Session):
     'statusHistory': %s,
     'dataSetName': '%s',
     'targetColumn': '%s',
+    'modelId': '%s',
     'startDate': '%s',
     'endDate': '%s',
     'resultInterval': '%s',
@@ -159,11 +182,12 @@ class SessionResult(Session):
     'requestedDate': '%s',
     'isEstimate': %s,
     'extraParameters': %s,
+    'availablePredictionIntervals': '%s',
     'links': %s,
     'metrics': %s,
     'data': %s
 })""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
-            self._target_column, self._start_date, self._end_date, self._result_interval.name,
-            self._column_metadata, self._requested_date, self._is_estimate,
+            self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
+            self._column_metadata, self._requested_date, self._is_estimate, self._available_prediction_intervals,
             self._extra_parameters, self._links, self._metrics, self._data)
 
