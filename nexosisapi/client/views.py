@@ -1,3 +1,4 @@
+from nexosisapi.paged_list import PagedList
 from nexosisapi.view_definition import ViewDefinition, ViewData, Join
 
 
@@ -17,8 +18,12 @@ class Views(object):
         :return: a `list` of ViewDefinition objects representing the views stored
         :rtype: list
         """
-        listing = self._client.request('GET', '/views', params={'partialName': partial_name, 'dataSetName': dataset_name, 'page': page_number, 'pageSize': page_size})
-        return [ViewDefinition(item) for item in listing.get('items', [])]
+        listing = self._client.request('GET', '/views',
+                                       params={'partialName': partial_name, 'dataSetName': dataset_name,
+                                               'page': page_number, 'pageSize': page_size})
+        return PagedList.from_response(
+            [ViewDefinition(item) for item in listing.get('items', [])],
+            listing)
 
     def create(self, name, dataset_name, right_datasource_name):
         """Create a view or update an existing one by name
@@ -99,6 +104,6 @@ class Views(object):
         params = {}
 
         if cascade is not None:
-            params = {'cascade':'sessions'}
+            params = {'cascade': 'sessions'}
 
         self._client.request('DELETE', 'views/%s' % view_name, params=params)

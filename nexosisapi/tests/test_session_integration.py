@@ -1,4 +1,3 @@
-import csv
 import time
 import os
 
@@ -10,46 +9,37 @@ from nexosisapi.column_metadata import ColumnMetadata
 from nexosisapi import Client, ClientError
 from nexosisapi.session import SessionType
 from nexosisapi.status import Status
+from nexosisapi.tests import build_test_dataset
 
 
 class SessionIntegrationTests(unittest.TestCase):
-    def setUp(self):
-        def build_test_dataset(file, dataset_name):
-            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file)) as f:
-                csv_data = csv.DictReader(f)
-                data = [dict(d) for d in csv_data]
-            try:
-                self.test_client.datasets.get(dataset_name)
-            except ClientError as e:
-                if e.status == 404:
-                    self.test_client.datasets.create(dataset_name, data)
-                else:
-                    raise
-            return data
 
-        self.forecast = None
-        self.impact = None
-        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
-        self.ds_name = 'data-sessions-integration'
-        self.regression_ds_name = 'data-regression-integration'
+    @classmethod
+    def setUpClass(cls):
+        cls.forecast = None
+        cls.impact = None
+        cls.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
+        cls.ds_name = 'data-sessions-integration'
+        cls.regression_ds_name = 'data-regression-integration'
 
-        self.data = build_test_dataset('data/data.csv', self.ds_name)
-        self.regression_data = build_test_dataset('data/regression-data.csv', self.regression_ds_name)
+        cls.data = build_test_dataset(cls.test_client, 'data/data.csv', cls.ds_name)
+        cls.regression_data = build_test_dataset(cls.test_client, 'data/regression-data.csv', cls.regression_ds_name)
 
-        self._setup_sessions()
+        cls._setup_sessions()
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         try:
-            session_list = self.test_client.sessions.list()
+            session_list = cls.test_client.sessions.list()
 
             for session in session_list:
-                if session.dataset_name != self.ds_name:
-                    self.test_client.sessions.remove(session.session_id)
+                if session.dataset_name != cls.ds_name:
+                    cls.test_client.sessions.remove(session.session_id)
 
-            dataset_list = self.test_client.datasets.list('test-session-integration')
+            dataset_list = cls.test_client.datasets.list('test-session-integration')
 
             for dataset in dataset_list:
-                self.test_client.datasets.remove(dataset.name)
+                cls.test_client.datasets.remove(dataset.name)
 
         except ClientError:
             pass
@@ -60,6 +50,11 @@ class SessionIntegrationTests(unittest.TestCase):
         name = set([s.dataset_name for s in results])
 
         self.assertEqual(1, len(name))
+
+    def test_list_is_paged(self):
+        actual = self.test_client.sessions.list(page_number=1,page_size=10)
+        self.assertEqual(1, actual.page_number)
+        self.assertEqual(10, actual.page_size)
 
     def test_create_forecast(self):
         self.test_client.datasets.create('test-session-integration-forecast', self.data)
@@ -106,7 +101,7 @@ class SessionIntegrationTests(unittest.TestCase):
     def test_get_results(self):
         results = self.test_client.sessions.get_results(self.forecast.session_id)
 
-        self.assertEqual(len(results.data), 29)
+        self.assertEqual(len(results.data), 30)
 
     def test_remove_session(self):
         session = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
@@ -152,30 +147,30 @@ class SessionIntegrationTests(unittest.TestCase):
         }
         results = self.test_client.sessions.train_regression_model(self.regression_ds_name, 'profit', columns)
 
-
-    def _setup_sessions(self):
+    @classmethod
+    def _setup_sessions(cls):
         # check if we have a session data for forecast and impact, and if not, kick them off
-        current_sessions = self.test_client.sessions.list(self.ds_name)
+        current_sessions = cls.test_client.sessions.list(cls.ds_name)
         for s in current_sessions:
             if s.type == SessionType.forecast:
-                self.forecast = s
+                cls.forecast = s
             if s.type == SessionType.impact:
-                self.impact = s
+                cls.impact = s
 
-        if self.forecast is None:
-            self.forecast = self.test_client.sessions.create_forecast(self.ds_name, 'observed',
+        if cls.forecast is None:
+            cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
                                                                       dateutil.parser.parse('2008-09-01'),
                                                                       dateutil.parser.parse('2008-09-30'))
-        if self.impact is None:
-            self.impact = self.test_client.sessions.analyze_impact(self.ds_name, 'observed',
+        if cls.impact is None:
+            cls.impact = cls.test_client.sessions.analyze_impact(cls.ds_name, 'observed',
                                                                    'integration-test-analysis',
                                                                    dateutil.parser.parse('2008-08-01'),
                                                                    dateutil.parser.parse('2008-08-31'))
 
         counter = 0
-        while self.impact.status != Status.completed and self.forecast.status != Status.completed:
-            self.impact = self.test_client.sessions.get(self.impact.session_id)
-            self.forecast = self.test_client.sessions.get(self.forecast.session_id)
+        while cls.impact.status != Status.completed and cls.forecast.status != Status.completed:
+            cls.impact = cls.test_client.sessions.get(cls.impact.session_id)
+            cls.forecast = cls.test_client.sessions.get(cls.forecast.session_id)
 
             if counter > 120:
                 raise TimeoutError('Running the sessions took longer than 10 minutes of setup time...')

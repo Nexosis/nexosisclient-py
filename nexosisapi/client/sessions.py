@@ -1,3 +1,4 @@
+from nexosisapi.paged_list import PagedList
 from nexosisapi.session import SessionResult, SessionResponse
 from nexosisapi.time_interval import TimeInterval
 
@@ -165,8 +166,9 @@ class Sessions(object):
             'sessionType': session_type
         }
         response, _, headers = self._client.request_with_headers('GET', 'sessions', params=query)
-
-        return [SessionResponse(item, headers) for item in response.get('items', [])]
+        return PagedList.from_response(
+            [SessionResponse(item, headers) for item in response.get('items', [])],
+            response)
 
     def remove(self, session_id):
         """Remove a session based on the session id
