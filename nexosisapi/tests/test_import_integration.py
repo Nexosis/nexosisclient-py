@@ -1,12 +1,8 @@
-import csv
-import time
 import os
-import dateutil.parser
 import unittest
 
 from nexosisapi import Client
 from nexosisapi.column_metadata import ColumnMetadata
-from nexosisapi.import_response import ImportType
 from nexosisapi.status import Status
 
 

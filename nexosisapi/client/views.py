@@ -14,7 +14,7 @@ class Views(object):
         :param str dataset_name: optional filter to limit views based on dataset name
         :param int page_number: optional zero-based page number of results to retrieve
         :param int page_size: optional count of results to retrieve in each page (default 50, max 1000).
-        :return: a :class:`list` of ViewDefinition objects representing the views stored
+        :return: a `list` of ViewDefinition objects representing the views stored
         :rtype: list
         """
         listing = self._client.request('GET', '/views', params={'partialName': partial_name, 'dataSetName': dataset_name, 'page': page_number, 'pageSize': page_size})

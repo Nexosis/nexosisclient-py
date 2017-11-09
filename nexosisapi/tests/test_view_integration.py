@@ -11,8 +11,8 @@ from nexosisapi.calendar_join import CalendarJoin
 
 class ViewsIntegrationTests(unittest.TestCase):
     def setUp(self):
-        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"],
-                                  uri=os.environ["NEXOSIS_API_TESTURI"])
+        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
+
         self.ds_name = "data-%s" % datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         self.ds_name_right = 'right-' + self.ds_name
 
