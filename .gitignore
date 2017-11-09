@@ -104,3 +104,5 @@ ENV/
 .setenv
 
 .vscode/
+
+**/.DS_Store
