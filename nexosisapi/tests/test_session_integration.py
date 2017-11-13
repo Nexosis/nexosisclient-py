@@ -150,11 +150,9 @@ class SessionIntegrationTests(unittest.TestCase):
     def _setup_sessions(cls):
         # check if we have a session data for forecast and impact, and if not, kick them off
         current_sessions = cls.test_client.sessions.list(cls.ds_name)
-        for s in current_sessions:
-            if s.type == SessionType.forecast:
-                cls.forecast = s
-            if s.type == SessionType.impact:
-                cls.impact = s
+
+        cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
+        cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
 
         if cls.forecast is None:
             cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
