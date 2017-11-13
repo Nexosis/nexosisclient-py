@@ -9,6 +9,7 @@ from nexosisapi import Client, ClientError
 from nexosisapi.view_definition import ViewDefinition
 from nexosisapi.calendar_join import CalendarJoin
 
+
 class ViewsIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
@@ -42,7 +43,7 @@ class ViewsIntegrationTests(unittest.TestCase):
             self.test_client.datasets.remove(self.ds_name, cascade="view")
             self.test_client.datasets.remove(self.ds_name_right)
         except ClientError as error:
-            sys.stderr.write(error)
+            sys.stdout.write('Cleanup of views encountered error. Continuing')
 
     def test_create_view(self):
         self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
@@ -65,6 +66,11 @@ class ViewsIntegrationTests(unittest.TestCase):
         self.assertEqual(1, len(views))
         self.assertEqual('alpha-beta-mike', views[0].view_name)
 
+    def test_list_is_paged(self):
+        actual = self.test_client.views.list(page_number=1, page_size=10)
+        self.assertEqual(1, actual.page_number)
+        self.assertEqual(10, actual.page_size)
+
     def test_get_view(self):
         view_data = self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
 
@@ -72,7 +78,8 @@ class ViewsIntegrationTests(unittest.TestCase):
         self.assertEqual(self.ds_name, view_data.dataset_name)
 
     def test_add_with_named_calendar(self):
-        view_def = ViewDefinition({'viewName': 'testPyView', 'dataSetName': self.ds_name, 'joins': [{'calendar': {'name': 'Nexosis.Holidays-US'}}]})
+        view_def = ViewDefinition({'viewName': 'testPyView', 'dataSetName': self.ds_name,
+                                   'joins': [{'calendar': {'name': 'Nexosis.Holidays-US'}}]})
         created_view = self.test_client.views.create_by_definition(view_def)
         self.assertIsNotNone(created_view)
         self.assertIsInstance(created_view.joins[0].join_target, CalendarJoin)
@@ -83,4 +90,4 @@ class ViewsIntegrationTests(unittest.TestCase):
                                    'joins': [{'calendar': {'url': iCal_url}}]})
         created_view = self.test_client.views.create_by_definition(view_def)
         self.assertIsNotNone(created_view)
-        self.assertEqual(iCal_url,created_view.joins[0].join_target.url)
+        self.assertEqual(iCal_url, created_view.joins[0].join_target.url)

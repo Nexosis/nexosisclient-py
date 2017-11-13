@@ -1,9 +1,11 @@
 from nexosisapi.dataset import Dataset
 from nexosisapi.dataset_summary import DatasetSummary
+from nexosisapi.paged_list import PagedList
 
 
 class Datasets(object):
     """Dataset based API operations"""
+
     def __init__(self, base_client):
         self._client = base_client
 
@@ -40,15 +42,22 @@ class Datasets(object):
 
         return DatasetSummary(response)
 
-    def list(self, partial_name=''):
+    def list(self, partial_name='', page_number=0, page_size=50):
         """Get the list of saved datasets, optionally filtering by name
 
         :param str partial_name:
         :return: a `list` of DatasetSummary objects representing the dataset stored
         :rtype: list
         """
-        listing = self._client.request('GET', '/data', params={'partialName': partial_name})
-        return [DatasetSummary(item) for item in listing.get('items', [])]
+        query = {
+            'page': page_number,
+            'pageSize': page_size,
+            'partialName': partial_name}
+        listing = self._client.request('GET', '/data', params=query)
+
+        return PagedList.from_response(
+            [DatasetSummary(item) for item in listing.get('items', [])],
+            listing)
 
     def get(self, dataset_name, page_number=0, page_size=50, start_date=None, end_date=None, include=None):
         """Get the data stored in a data set

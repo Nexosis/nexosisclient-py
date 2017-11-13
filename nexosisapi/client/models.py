@@ -1,4 +1,5 @@
 from nexosisapi.model_summary import ModelSummary, PredictResults
+from nexosisapi.paged_list import PagedList
 
 
 class Models(object):
@@ -24,7 +25,9 @@ class Models(object):
             'createdAfter': created_after,
         }
         response = self._client.request('GET', 'models', params=query)
-        return [ModelSummary(model) for model in response.get('items', [])]
+        return PagedList.from_response(
+            [ModelSummary(model) for model in response.get('items', [])],
+            response)
 
     def get_model(self, model_id):
         """Get a model by id

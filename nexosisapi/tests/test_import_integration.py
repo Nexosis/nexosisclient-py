@@ -33,3 +33,8 @@ class ImportIntegrationTests(unittest.TestCase):
         import_list = self.test_client.imports.list()
 
         self.assertGreater(len(import_list), 0)
+
+    def test_list_is_paged(self):
+        actual = self.test_client.imports.list(page_number=1, page_size=10)
+        self.assertEqual(1, actual.page_number)
+        self.assertEqual(10, actual.page_size)
