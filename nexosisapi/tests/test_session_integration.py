@@ -100,8 +100,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_get_results(self):
         results = self.test_client.sessions.get_results(self.forecast.session_id)
-
-        self.assertEqual(len(results.data), 30)
+        self.assertGreater(len(results.data), 0)
 
     def test_remove_session(self):
         session = self.test_client.sessions.estimate_forecast(self.ds_name, 'observed',
