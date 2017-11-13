@@ -43,7 +43,7 @@ class ViewsIntegrationTests(unittest.TestCase):
             self.test_client.datasets.remove(self.ds_name, cascade="view")
             self.test_client.datasets.remove(self.ds_name_right)
         except ClientError as error:
-            sys.stderr.write(error)
+            sys.stdout.write(error)
 
     def test_create_view(self):
         self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
