@@ -93,6 +93,11 @@ class DatasetsIntegrationTests(unittest.TestCase):
 
         self.assertIn(self.ds_name, map(lambda x: x.name, ds_list))
 
+    def test_list_is_paged(self):
+        actual = self.test_client.datasets.list(page_number=1, page_size=10)
+        self.assertEqual(1, actual.page_number)
+        self.assertEqual(10, actual.page_size)
+
     def test_list_with_filtering(self):
         self.test_client.datasets.create(self.ds_name, self.data)
 
@@ -154,4 +159,4 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.test_client.datasets.remove(self.ds_name, end_date=datetime.strptime('2008-06-30', '%Y-%m-%d'))
 
         partial = self.test_client.datasets.get(self.ds_name, page_size=1000)
-        self.assertEqual(len(self.data) - 30, len(partial.data))
+        self.assertEqual(len(self.data) - 61, len(partial.data))
