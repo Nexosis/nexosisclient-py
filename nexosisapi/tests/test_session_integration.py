@@ -65,15 +65,6 @@ class SessionIntegrationTests(unittest.TestCase):
         self.assertIsNotNone(forecast)
         self.assertEqual(SessionType.forecast, forecast.type)
 
-    def test_estimate_forecast(self):
-        self.test_client.datasets.create('test-session-integration-forecast', self.data)
-        forecast = self.test_client.sessions.estimate_forecast('test-session-integration-forecast', 'observed',
-                                                               dateutil.parser.parse('2008-07-01'),
-                                                               dateutil.parser.parse('2008-07-31'))
-
-        self.assertIsNotNone(forecast)
-        self.assertTrue(forecast.is_estimate)
-        self.assertEqual('0.01 USD', forecast.cost)
 
     def test_create_impact(self):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
@@ -86,17 +77,6 @@ class SessionIntegrationTests(unittest.TestCase):
 
         self.assertEqual(SessionType.impact, impact.type)
 
-    def test_estimate_impact(self):
-        self.test_client.datasets.create('test-session-integration-impact', self.data)
-        impact = self.test_client.sessions.estimate_impact('test-session-integration-impact', 'observed',
-                                                           'create-impact-test',
-                                                           dateutil.parser.parse('2008-06-01'),
-                                                           dateutil.parser.parse('2008-06-30'))
-
-        self.assertIsNotNone(impact)
-
-        self.assertTrue(impact.is_estimate)
-        self.assertEqual('0.01 USD', impact.cost)
 
     def test_get_results(self):
         results = self.test_client.sessions.get_results(self.forecast.session_id)

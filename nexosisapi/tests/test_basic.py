@@ -15,8 +15,3 @@ class BasicTests(unittest.TestCase):
     def test_can_override_client_base_uri(self):
         target = nexosisapi.Client(uri='https://something.example.com/v1')
         self.assertEqual(target._uri, 'https://something.example.com/v1', 'uri not set by constructor')
-
-    def test_api_returns_current_balance(self):
-        actual = self.test_client.get_account_balance()
-        self.assertIsNotNone(actual)
-        self.assertTrue(actual > 0)
