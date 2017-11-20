@@ -124,7 +124,7 @@ class SessionIntegrationTests(unittest.TestCase):
             'florida': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
             'cali': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
         }
-        results = self.test_client.sessions.train_regression_model(self.regression_ds_name, 'profit', columns)
+        results = self.test_client.sessions.train_model(self.regression_ds_name, 'profit', columns)
 
     @classmethod
     def _setup_sessions(cls):

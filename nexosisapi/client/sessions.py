@@ -118,13 +118,13 @@ class Sessions(object):
                                                     event_name, result_interval, is_estimate=True)
         return SessionResponse(response, headers)
 
-    def train_regression_model(self, datasource_name, target_column=None, column_metadata=None, is_estimate=False, callback_url=None):
-        """Train a model for use in regression analysis
+    def train_model(self, datasource_name, target_column=None, column_metadata=None, prediction_domain='regression',callback_url=None):
+        """Train a model for later predictions
 
         :param str datasource_name: the name of the data source to forecast on
         :param str target_column: the column from the data source that will be requested in predictions
         :param object column_metadata: a dict of column name mapped to ColumnMetadata objects describing the columns used in the modeling process
-        :param bool is_estimate: should this just return a cost estimate instead of running computations
+        :param string prediction_domain:
         :param str callback_url: the url to callback to on session status change events
 
         :return the session description
@@ -136,7 +136,6 @@ class Sessions(object):
                                                      'dataSourceName': datasource_name,
                                                      'targetColumn': target_column,
                                                      'columns': column_metadata,
-                                                     'isEstimate': is_estimate,
                                                      'callbackUrl': callback_url
                                                  })
 
