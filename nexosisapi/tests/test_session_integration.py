@@ -7,6 +7,7 @@ import unittest
 from nexosisapi.column_metadata import ColumnMetadata
 
 from nexosisapi import Client, ClientError
+from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.session import SessionType
 from nexosisapi.status import Status
 from nexosisapi.tests import build_test_dataset
@@ -21,10 +22,11 @@ class SessionIntegrationTests(unittest.TestCase):
         cls.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
         cls.ds_name = 'data-sessions-integration'
         cls.regression_ds_name = 'data-regression-integration'
+        cls.classification_ds_name = 'data-classification-integration'
 
         cls.data = build_test_dataset(cls.test_client, 'data/data.csv', cls.ds_name)
         cls.regression_data = build_test_dataset(cls.test_client, 'data/regression-data.csv', cls.regression_ds_name)
-
+        cls.classification_data = build_test_dataset(cls.test_client, 'data/iris_data.csv', cls.classification_ds_name)
         cls._setup_sessions()
 
     @classmethod
@@ -32,6 +34,7 @@ class SessionIntegrationTests(unittest.TestCase):
         try:
             cls.test_client.datasets.remove(cls.ds_name, cascade="session")
             cls.test_client.datasets.remove(cls.regression_ds_name, cascade="session")
+            cls.test_client.datasets.remove(cls.classification_ds_name, cascade="session")
             dataset_list = cls.test_client.datasets.list('test-session-integration')
 
             for dataset in dataset_list:
@@ -122,13 +125,24 @@ class SessionIntegrationTests(unittest.TestCase):
         }
         results = self.test_client.sessions.train_model(self.regression_ds_name, 'profit', columns)
 
+    def test_create_classification_model(self):
+        result = self.test_client.sessions.train_model(self.classification_ds_name,'iris',prediction_domain='classification')
+        self.assertEqual(result.prediction_domain.lower(),'classification')
+
+    def test_get_confusion_matrix(self):
+        actual = self.test_client.sessions.get_confusion_matrix(self.classification.session_id)
+        self.assertIsNotNone(actual)
+        self.assertIsInstance(actual, ConfusionMatrix)
+        self.assertGreater(len(actual.values), 0)
+
     @classmethod
     def _setup_sessions(cls):
         # check if we have a session data for forecast and impact, and if not, kick them off
-        current_sessions = cls.test_client.sessions.list(cls.ds_name)
+        current_sessions = cls.test_client.sessions.list('', page_size=100)
 
         cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
         cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
+        cls.classification = next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
 
         if cls.forecast is None:
             cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
@@ -140,8 +154,11 @@ class SessionIntegrationTests(unittest.TestCase):
                                                                    dateutil.parser.parse('2008-08-01'),
                                                                    dateutil.parser.parse('2008-08-31'))
 
+        if cls.classification is None:
+            cls.classification = cls.test_client.sessions.train_model(cls.classification_ds_name, 'iris', prediction_domain='classification')
+
         counter = 0
-        while cls.impact.status != Status.completed and cls.forecast.status != Status.completed:
+        while cls.impact.status != Status.completed and cls.forecast.status != Status.completed and cls.classification.status != Status.completed:
             cls.impact = cls.test_client.sessions.get(cls.impact.session_id)
             cls.forecast = cls.test_client.sessions.get(cls.forecast.session_id)
 

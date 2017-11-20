@@ -1,3 +1,4 @@
+from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.paged_list import PagedList
 from nexosisapi.session import SessionResult, SessionResponse
 from nexosisapi.time_interval import TimeInterval
@@ -124,7 +125,7 @@ class Sessions(object):
         :param str datasource_name: the name of the data source to forecast on
         :param str target_column: the column from the data source that will be requested in predictions
         :param object column_metadata: a dict of column name mapped to ColumnMetadata objects describing the columns used in the modeling process
-        :param string prediction_domain:
+        :param string prediction_domain: a string indicating the desired model type: either 'regression' or 'classification'
         :param str callback_url: the url to callback to on session status change events
 
         :return the session description
@@ -132,7 +133,7 @@ class Sessions(object):
         """
         response, _, headers = self._client.request_with_headers('POST', 'sessions/model',
                                                  data={
-                                                     'predictionDomain': 'regression',
+                                                     'predictionDomain': prediction_domain,
                                                      'dataSourceName': datasource_name,
                                                      'targetColumn': target_column,
                                                      'columns': column_metadata,
@@ -209,3 +210,17 @@ class Sessions(object):
 
         response, _, headers = self._client.request_with_headers('GET', 'sessions/%s' % session_id)
         return SessionResponse(response, headers)
+
+    def get_confusion_matrix(self, session_id):
+        """Get the confusion matrix results for a completed classification model.
+        Note - will return 404 if not a completed classification model session
+
+        :param session_id: the completed classification model building session
+        :returns: a session result that includes matrix and labels
+        :rtype: ConfusionMatrix
+        """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
+        response = self._client.request('GET', 'sessions/%s/results/confusionmatrix' % session_id)
+        return ConfusionMatrix(response)

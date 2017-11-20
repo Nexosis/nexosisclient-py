@@ -45,6 +45,7 @@ class Session(object):
             if 'resultInterval' in data_dict and data_dict['resultInterval'] \
             else TimeInterval.day
         self._available_prediction_intervals = data_dict.get('availablePredictionIntervals')
+        self._prediction_domain = data_dict.get('predictionDomain', 'none')
         md = data_dict.get('metadata') or {}
         self._column_metadata = {key: ColumnMetadata(value) for (key, value) in md.items()}
 
@@ -107,6 +108,10 @@ class Session(object):
     @property
     def available_prediction_intervals(self):
         return self._available_prediction_intervals
+
+    @property
+    def prediction_domain(self):
+        return self._prediction_domain
 
     @property
     def extra_parameters(self):
