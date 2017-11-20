@@ -142,7 +142,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
         cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
         cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
-        cls.classification = None#next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
+        cls.classification = next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
 
         if cls.forecast is None:
             cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
