@@ -161,7 +161,8 @@ class SessionIntegrationTests(unittest.TestCase):
         while cls.impact.status != Status.completed and cls.forecast.status != Status.completed and cls.classification.status != Status.completed:
             cls.impact = cls.test_client.sessions.get(cls.impact.session_id)
             cls.forecast = cls.test_client.sessions.get(cls.forecast.session_id)
-
+            cls.classification = cls.test_client.sessions.get(cls.classification.session_id)
+            
             if counter > 120:
                 raise TimeoutError('Running the sessions took longer than 10 minutes of setup time...')
 
