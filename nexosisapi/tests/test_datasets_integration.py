@@ -89,7 +89,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(len(self.data), len(check.data))
 
     def test_list_datasets(self):
-        ds_list = self.test_client.datasets.list()
+        ds_list = self.test_client.datasets.list('', 0, 100)
 
         self.assertIn(self.ds_name, map(lambda x: x.name, ds_list))
 

@@ -11,56 +11,53 @@ from nexosisapi.calendar_join import CalendarJoin
 
 
 class ViewsIntegrationTests(unittest.TestCase):
-    def setUp(self):
-        self.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
+    @classmethod
+    def setUpClass(cls):
+        cls.test_client = Client(key=os.environ["NEXOSIS_API_TESTKEY"], uri=os.environ["NEXOSIS_API_TESTURI"])
 
-        self.ds_name = "data-%s" % datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        self.ds_name_right = 'right-' + self.ds_name
+        cls.ds_name = "viewdata-%s" % datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        cls.ds_name_right = 'right-' + cls.ds_name
 
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/data.csv')) as f:
             csv_data = csv.DictReader(f)
-            self.data = [dict(d) for d in csv_data]
+            cls.data = [dict(d) for d in csv_data]
 
         try:
-            self.test_client.datasets.get(self.ds_name)
+            cls.test_client.datasets.get(cls.ds_name)
         except ClientError as error:
             if error.status == 404:
-                self.test_client.datasets.create(self.ds_name, self.data)
+                cls.test_client.datasets.create(cls.ds_name, cls.data)
             else:
                 raise
 
         try:
-            self.test_client.datasets.get(self.ds_name_right)
+            cls.test_client.datasets.get(cls.ds_name_right)
         except ClientError as error:
             if error.status == 404:
-                self.test_client.datasets.create(self.ds_name_right, self.data)
+                cls.test_client.datasets.create(cls.ds_name_right, cls.data)
             else:
                 raise
+        cls.test_client.views.create("alpha-beta-mike", cls.ds_name, cls.ds_name_right)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         try:
-            self.test_client.views.remove("alpha-beta-mike")
-            self.test_client.datasets.remove(self.ds_name, cascade="view")
-            self.test_client.datasets.remove(self.ds_name_right)
+            cls.test_client.datasets.remove(cls.ds_name, cascade="view")
+            cls.test_client.datasets.remove(cls.ds_name_right)
         except ClientError as error:
             sys.stdout.write('Cleanup of views encountered error. Continuing')
 
-    def test_create_view(self):
-        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
-
     def test_delete_view(self):
-        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
+        self.test_client.views.create('python-test-remove', self.ds_name, self.ds_name_right)
 
-        self.test_client.views.remove('alpha-beta-mike')
+        self.test_client.views.remove('python-test-remove')
 
         try:
-            self.test_client.views.get('alpha-beta-mike')
+            self.test_client.views.get('python-test-remove')
         except ClientError as error:
             self.assertEqual(404, error.status)
 
     def test_list_views(self):
-        self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
-
         views = self.test_client.views.list(partial_name='alpha-beta-mike')
 
         self.assertEqual(1, len(views))
@@ -72,7 +69,7 @@ class ViewsIntegrationTests(unittest.TestCase):
         self.assertEqual(10, actual.page_size)
 
     def test_get_view(self):
-        view_data = self.test_client.views.create('alpha-beta-mike', self.ds_name, self.ds_name_right)
+        view_data = self.test_client.views.get("alpha-beta-mike")
 
         self.assertEqual('alpha-beta-mike', view_data.view_name)
         self.assertEqual(self.ds_name, view_data.dataset_name)
