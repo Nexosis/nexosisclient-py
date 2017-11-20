@@ -30,16 +30,12 @@ class SessionIntegrationTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         try:
-            session_list = cls.test_client.sessions.list()
-
-            for session in session_list:
-                if session.dataset_name != cls.ds_name:
-                    cls.test_client.sessions.remove(session.session_id)
-
+            cls.test_client.datasets.remove(cls.ds_name, cascade="session")
+            cls.test_client.datasets.remove(cls.regression_ds_name, cascade="session")
             dataset_list = cls.test_client.datasets.list('test-session-integration')
 
             for dataset in dataset_list:
-                cls.test_client.datasets.remove(dataset.name)
+                cls.test_client.datasets.remove(dataset.name, cascade="session")
 
         except ClientError:
             pass
