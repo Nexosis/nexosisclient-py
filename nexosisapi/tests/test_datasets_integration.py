@@ -99,7 +99,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(10, actual.page_size)
 
     def test_list_with_filtering(self):
-        ds_list = self.test_client.datasets.list(self.ds_name[:10])
+        ds_list = self.test_client.datasets.list(self.ds_name[:10], 0, 100)
 
         self.assertIn(self.ds_name, [x.name for x in ds_list])
 
