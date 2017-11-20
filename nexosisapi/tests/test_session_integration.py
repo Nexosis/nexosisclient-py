@@ -142,7 +142,7 @@ class SessionIntegrationTests(unittest.TestCase):
 
         cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
         cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
-        cls.classification = next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
+        cls.classification = None#next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
 
         if cls.forecast is None:
             cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
@@ -158,11 +158,11 @@ class SessionIntegrationTests(unittest.TestCase):
             cls.classification = cls.test_client.sessions.train_model(cls.classification_ds_name, 'iris', prediction_domain='classification')
 
         counter = 0
-        while cls.impact.status != Status.completed and cls.forecast.status != Status.completed and cls.classification.status != Status.completed:
+        while cls.impact.status != Status.completed or cls.forecast.status != Status.completed or cls.classification.status != Status.completed:
             cls.impact = cls.test_client.sessions.get(cls.impact.session_id)
             cls.forecast = cls.test_client.sessions.get(cls.forecast.session_id)
             cls.classification = cls.test_client.sessions.get(cls.classification.session_id)
-            
+
             if counter > 120:
                 raise TimeoutError('Running the sessions took longer than 10 minutes of setup time...')
 
