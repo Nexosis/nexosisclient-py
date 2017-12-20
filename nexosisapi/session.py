@@ -39,7 +39,6 @@ class Session(object):
             self._end_date = None
         self._requested_date = dateutil.parser.parse(data_dict['requestedDate'])
         self._links = data_dict['links']
-        self._is_estimate = bool(data_dict['isEstimate'])
         self._extra_parameters = data_dict['extraParameters']
         self._result_interval = TimeInterval[data_dict['resultInterval']] \
             if 'resultInterval' in data_dict and data_dict['resultInterval'] \
