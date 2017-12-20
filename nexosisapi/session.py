@@ -23,7 +23,7 @@ class Session(object):
         self._type = SessionType[data_dict['type']]
         self._status = Status[data_dict['status']]
         self._status_history = data_dict['statusHistory']
-        self._dataset_name = data_dict['dataSetName']
+        self._datasource_name = data_dict['dataSourceName']
         self._target_column = data_dict['targetColumn']
         if 'modelId' in data_dict:
             self._model_id = data_dict['modelId']
@@ -65,8 +65,8 @@ class Session(object):
         return self._status_history
 
     @property
-    def dataset_name(self):
-        return self._dataset_name
+    def datasource_name(self):
+        return self._datasource_name
 
     @property
     def target_column(self):

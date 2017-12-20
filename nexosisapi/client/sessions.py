@@ -2,7 +2,9 @@ from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.paged_list import PagedList
 from nexosisapi.session import SessionResult, SessionResponse
 from nexosisapi.time_interval import TimeInterval
-
+from nexosisapi.session_contest import SessionContest
+from nexosisapi.algorithm_contestant import AlgorithmContestant
+from nexosisapi.session_selection_metrics import SessionSelectionMetrics
 
 class Sessions(object):
     """Session based API operations"""
@@ -224,3 +226,56 @@ class Sessions(object):
 
         response = self._client.request('GET', 'sessions/%s/results/confusionmatrix' % session_id)
         return ConfusionMatrix(response)
+
+    def get_contest(self, session_id):
+        """
+        get information about the algorithm contestants used to determine session results
+        :param session_id: the unique id of a completed session
+        :returns: a collection of algorithms
+        :rtype: SessionContest
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET', 'sessions/%s/contest' % session_id)
+        return SessionContest(response)
+
+    def get_champion(self, session_id):
+        """
+        Information about the winning algorithm for the given session
+        :param session_id: the unique id of a completed session
+        :returns: name, metrics and test data for champion of this session
+        :rtype: AlgorithmContestant
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET', 'sessions/%s/contest/champion' % session_id)
+        return AlgorithmContestant(response)
+
+    def get_contestant(self, session_id, contestant_id):
+        """
+        Information about a contestant for this session
+        :param session_id: the unique id of a completed session
+        :param contestant_id: the unique id of the contestant from the session contest
+        :returns: name, metrics, and test data for the given contestant
+        :rtype: AlgorithmContestant
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        if contestant_id is None or not contestant_id:
+            raise ValueError('contestant_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/contest/contestants/{1}'.format(session_id, contestant_id))
+        return AlgorithmContestant(response)
+
+    def get_contest_selection_criteria(self, session_id):
+        """
+        Information about the dataset on which the session was based
+        :param session_id: the unique id of a completed session
+        :returns: dataset metrics used in algorithm selection
+        :rtype: SessionSelectionMetrics
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/contest/selection'.format(session_id))
+        return SessionSelectionMetrics(response)
