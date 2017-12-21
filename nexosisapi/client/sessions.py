@@ -1,7 +1,10 @@
+from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.paged_list import PagedList
 from nexosisapi.session import SessionResult, SessionResponse
 from nexosisapi.time_interval import TimeInterval
-
+from nexosisapi.session_contest import SessionContest
+from nexosisapi.algorithm_contestant import AlgorithmContestant
+from nexosisapi.session_selection_metrics import SessionSelectionMetrics
 
 class Sessions(object):
     """Session based API operations"""
@@ -10,7 +13,7 @@ class Sessions(object):
         self._client = client
 
     def _create_session(self, datasource_name, action_type, start_date, end_date, target_column=None, event_name=None,
-                        result_interval=TimeInterval.day, is_estimate=False, column_metadata=None, callback_url=None):
+                        result_interval=TimeInterval.day, column_metadata=None, callback_url=None):
         if datasource_name is None:
             raise ValueError('datasource_name is required and was not provided')
         if start_date is None:
@@ -26,7 +29,6 @@ class Sessions(object):
                                                      'eventName': event_name,
                                                      'startDate': start_date,
                                                      'endDate': end_date,
-                                                     'isEstimate': is_estimate,
                                                      'resultInterval': result_interval.name,
                                                      'callbackUrl': callback_url
                                                  })
@@ -61,8 +63,7 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, result_interval=result_interval,
-                                                    is_estimate=False, column_metadata=column_metadata, callback_url=callback_url)
+        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, result_interval=result_interval, column_metadata=column_metadata, callback_url=callback_url)
 
         return SessionResponse(response, headers)
 
@@ -97,7 +98,7 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, target_column,
-                                                    result_interval=result_interval, is_estimate=True)
+                                                    result_interval=result_interval)
         return SessionResponse(response, headers)
 
     def estimate_impact(self, datasource_name, target_column, event_name, start_date, end_date,
@@ -115,16 +116,16 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(datasource_name, 'impact', start_date, end_date, target_column,
-                                                    event_name, result_interval, is_estimate=True)
+                                                    event_name, result_interval)
         return SessionResponse(response, headers)
 
-    def train_regression_model(self, datasource_name, target_column=None, column_metadata=None, is_estimate=False, callback_url=None):
-        """Train a model for use in regression analysis
+    def train_model(self, datasource_name, target_column=None, column_metadata=None, prediction_domain='regression',callback_url=None):
+        """Train a model for later predictions
 
         :param str datasource_name: the name of the data source to forecast on
         :param str target_column: the column from the data source that will be requested in predictions
         :param object column_metadata: a dict of column name mapped to ColumnMetadata objects describing the columns used in the modeling process
-        :param bool is_estimate: should this just return a cost estimate instead of running computations
+        :param string prediction_domain: a string indicating the desired model type: either 'regression' or 'classification'
         :param str callback_url: the url to callback to on session status change events
 
         :return the session description
@@ -132,11 +133,10 @@ class Sessions(object):
         """
         response, _, headers = self._client.request_with_headers('POST', 'sessions/model',
                                                  data={
-                                                     'predictionDomain': 'regression',
+                                                     'predictionDomain': prediction_domain,
                                                      'dataSourceName': datasource_name,
                                                      'targetColumn': target_column,
                                                      'columns': column_metadata,
-                                                     'isEstimate': is_estimate,
                                                      'callbackUrl': callback_url
                                                  })
 
@@ -210,3 +210,70 @@ class Sessions(object):
 
         response, _, headers = self._client.request_with_headers('GET', 'sessions/%s' % session_id)
         return SessionResponse(response, headers)
+
+    def get_confusion_matrix(self, session_id):
+        """Get the confusion matrix results for a completed classification model.
+        Note - will return 404 if not a completed classification model session
+
+        :param session_id: the completed classification model building session
+        :returns: a session result that includes matrix and labels
+        :rtype: ConfusionMatrix
+        """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
+        response = self._client.request('GET', 'sessions/%s/results/confusionmatrix' % session_id)
+        return ConfusionMatrix(response)
+
+    def get_contest(self, session_id):
+        """
+        get information about the algorithm contestants used to determine session results
+        :param session_id: the unique id of a completed session
+        :returns: a collection of algorithms
+        :rtype: SessionContest
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET', 'sessions/%s/contest' % session_id)
+        return SessionContest(response)
+
+    def get_champion(self, session_id):
+        """
+        Information about the winning algorithm for the given session
+        :param session_id: the unique id of a completed session
+        :returns: name, metrics and test data for champion of this session
+        :rtype: AlgorithmContestant
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET', 'sessions/%s/contest/champion' % session_id)
+        return AlgorithmContestant(response)
+
+    def get_contestant(self, session_id, contestant_id):
+        """
+        Information about a contestant for this session
+        :param session_id: the unique id of a completed session
+        :param contestant_id: the unique id of the contestant from the session contest
+        :returns: name, metrics, and test data for the given contestant
+        :rtype: AlgorithmContestant
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        if contestant_id is None or not contestant_id:
+            raise ValueError('contestant_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/contest/contestants/{1}'.format(session_id, contestant_id))
+        return AlgorithmContestant(response)
+
+    def get_contest_selection_criteria(self, session_id):
+        """
+        Information about the dataset on which the session was based
+        :param session_id: the unique id of a completed session
+        :returns: dataset metrics used in algorithm selection
+        :rtype: SessionSelectionMetrics
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/contest/selection'.format(session_id))
+        return SessionSelectionMetrics(response)

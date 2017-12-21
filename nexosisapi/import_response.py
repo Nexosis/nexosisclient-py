@@ -6,7 +6,9 @@ from nexosisapi.status import Status
 
 
 class ImportType(Enum):
-    s3 = 0
+    s3 = 0,
+    url = 1,
+    azure = 2
 
 
 class ImportResponse(object):

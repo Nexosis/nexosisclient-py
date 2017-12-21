@@ -2,7 +2,7 @@ import os
 import unittest
 import time
 
-from nexosisapi import Client
+from nexosisapi import Client, ClientError
 from nexosisapi.column_metadata import ColumnMetadata
 from nexosisapi.status import Status
 
@@ -24,7 +24,10 @@ class ImportIntegrationTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.test_client.datasets.remove('test-python-import', cascade="session")
+        try:
+            cls.test_client.datasets.remove('test-python-import', cascade="session")
+        except(ClientError):
+            print('test-python-import was already deleted.')
 
     def test_import_from_s3(self):
         self.assertIsNotNone(self.import_response)
