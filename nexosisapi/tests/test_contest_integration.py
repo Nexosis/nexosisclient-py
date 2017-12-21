@@ -9,6 +9,8 @@ class ContestIntegrationTests(unittest.TestCase):
     def setUpClass(cls):
         cls.test_client = Client(key=os.environ['NEXOSIS_PAID_API_TESTKEY'],
                                  uri=os.environ['NEXOSIS_API_TESTURI'])
+        if not os.environ['NEXOSIS_PAID_API_TESTKEY']:
+            print('Paid API key was not found')
         current_sessions = cls.test_client.sessions.list('', page_size=100)
         cls.completed_session = next((s for s in current_sessions if s.status == Status.completed), None)
 

@@ -46,7 +46,7 @@ class SessionIntegrationTests(unittest.TestCase):
     def test_list_sessions(self):
         results = self.test_client.sessions.list(self.ds_name)
 
-        name = set([s.dataset_name for s in results])
+        name = set([s.datasource_name for s in results])
 
         self.assertEqual(1, len(name))
 

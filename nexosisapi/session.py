@@ -93,10 +93,6 @@ class Session(object):
         return self._links
 
     @property
-    def is_estimate(self):
-        return self._is_estimate
-
-    @property
     def result_interval(self):
         return self._result_interval
 
@@ -122,7 +118,7 @@ class Session(object):
     'type': '%s',
     'status': '%s',
     'statusHistory': %s,
-    'dataSetName': '%s',
+    'dataSourceName': '%s',
     'targetColumn': '%s',
     'modelId': '%s',
     'startDate': '%s',
@@ -130,29 +126,48 @@ class Session(object):
     'resultInterval': '%s',
     'metadata': %s
     'requestedDate': '%s',
-    'isEstimate': %s,
     'availablePredictionIntervals': '%s',
     'extraParameters': %s,
     'links': %s
-})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
+})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._datasource_name,
             self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
-            self._column_metadata, self._requested_date, self._is_estimate, self._available_prediction_intervals,
+            self._column_metadata, self._requested_date, self._available_prediction_intervals,
             self._extra_parameters, self._links)
 
 
 class SessionResponse(Session):
     def __init__(self, data_dict, headers):
         super(SessionResponse, self).__init__(data_dict)
-        self._cost = headers.get('nexosis-request-cost')
-        self._balance = headers.get('nexosis-account-balance')
+        self._dataset_count = headers.get('nexosis-account-datasetcount-current')
+        self._datasets_allowed = headers.get('nexosis-account-datasetcount-allotted')
+        self._session_count = headers.get('nexosis-account-sessioncount-current')
+        self._sessions_allowed = headers.get('nexosis-account-sessioncount-allotted')
+        self._prediction_count = headers.get('nexosis-account-predictioncount-current')
+        self._predictions_allowed = headers.get('nexosis-account-predictioncount-allotted')
 
     @property
-    def cost(self):
-        return self._cost
+    def dataset_count(self):
+        return self._dataset_count
 
     @property
-    def balance(self):
-        return self._balance
+    def datasets_allowed(self):
+        return self._datasets_allowed
+
+    @property
+    def session_count(self):
+        return self._session_count
+
+    @property
+    def sessions_allowed(self):
+        return self._sessions_allowed
+
+    @property
+    def prediction_count(self):
+        return self._prediction_count
+
+    @property
+    def predictions_allowed(self):
+        return self._predictions_allowed
 
 
 class SessionResult(Session):
@@ -176,7 +191,7 @@ class SessionResult(Session):
     'type': '%s',
     'status': '%s',
     'statusHistory': %s,
-    'dataSetName': '%s',
+    'dataSourceName': '%s',
     'targetColumn': '%s',
     'modelId': '%s',
     'startDate': '%s',
@@ -184,14 +199,13 @@ class SessionResult(Session):
     'resultInterval': '%s',
     'metadata': %s
     'requestedDate': '%s',
-    'isEstimate': %s,
     'extraParameters': %s,
     'availablePredictionIntervals': '%s',
     'links': %s,
     'metrics': %s,
     'data': %s
-})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._dataset_name,
+})""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._datasource_name,
             self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
-            self._column_metadata, self._requested_date, self._is_estimate, self._available_prediction_intervals,
+            self._column_metadata, self._requested_date, self._available_prediction_intervals,
             self._extra_parameters, self._links, self._metrics, self._data)
 

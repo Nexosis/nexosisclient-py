@@ -13,7 +13,7 @@ class Sessions(object):
         self._client = client
 
     def _create_session(self, datasource_name, action_type, start_date, end_date, target_column=None, event_name=None,
-                        result_interval=TimeInterval.day, is_estimate=False, column_metadata=None, callback_url=None):
+                        result_interval=TimeInterval.day, column_metadata=None, callback_url=None):
         if datasource_name is None:
             raise ValueError('datasource_name is required and was not provided')
         if start_date is None:
@@ -29,7 +29,6 @@ class Sessions(object):
                                                      'eventName': event_name,
                                                      'startDate': start_date,
                                                      'endDate': end_date,
-                                                     'isEstimate': is_estimate,
                                                      'resultInterval': result_interval.name,
                                                      'callbackUrl': callback_url
                                                  })
@@ -64,8 +63,7 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, result_interval=result_interval,
-                                                    is_estimate=False, column_metadata=column_metadata, callback_url=callback_url)
+        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, result_interval=result_interval, column_metadata=column_metadata, callback_url=callback_url)
 
         return SessionResponse(response, headers)
 
@@ -100,7 +98,7 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, target_column,
-                                                    result_interval=result_interval, is_estimate=True)
+                                                    result_interval=result_interval)
         return SessionResponse(response, headers)
 
     def estimate_impact(self, datasource_name, target_column, event_name, start_date, end_date,
@@ -118,7 +116,7 @@ class Sessions(object):
         :rtype: SessionResponse
         """
         response, _, headers = self._create_session(datasource_name, 'impact', start_date, end_date, target_column,
-                                                    event_name, result_interval, is_estimate=True)
+                                                    event_name, result_interval)
         return SessionResponse(response, headers)
 
     def train_model(self, datasource_name, target_column=None, column_metadata=None, prediction_domain='regression',callback_url=None):
