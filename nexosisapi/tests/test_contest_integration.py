@@ -1,6 +1,9 @@
 import unittest
 import os
-from nexosisapi import Client
+
+import sys
+
+from nexosisapi import Client, ClientError
 from nexosisapi.status import Status
 
 
@@ -11,9 +14,12 @@ class ContestIntegrationTests(unittest.TestCase):
                                  uri=os.environ['NEXOSIS_API_TESTURI'])
         if not os.environ['NEXOSIS_PAID_API_TESTKEY']:
             print('Paid API key was not found')
-        current_sessions = cls.test_client.sessions.list('', page_size=100)
-        cls.completed_session = next((s for s in current_sessions if s.status == Status.completed), None)
-
+        try:
+            current_sessions = cls.test_client.sessions.list('', page_size=100)
+            cls.completed_session = next((s for s in current_sessions if s.status == Status.completed), None)
+        except ClientError as err:
+            print(err.message, file=sys.stderr)
+            raise
 
     def test_can_get_contest(self):
         actual = self.test_client.sessions.get_contest(self.completed_session.session_id)
