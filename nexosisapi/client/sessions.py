@@ -5,6 +5,9 @@ from nexosisapi.time_interval import TimeInterval
 from nexosisapi.session_contest import SessionContest
 from nexosisapi.algorithm_contestant import AlgorithmContestant
 from nexosisapi.session_selection_metrics import SessionSelectionMetrics
+from nexosisapi.class_scores import ClassScores
+from nexosisapi.anomaly_scores import AnomalyScores
+
 
 class Sessions(object):
     """Session based API operations"""
@@ -33,7 +36,8 @@ class Sessions(object):
                                                      'callbackUrl': callback_url
                                                  })
 
-    def create_forecast(self, datasource_name, target_column, start_date, end_date, result_interval=TimeInterval.day, callback_url=None):
+    def create_forecast(self, datasource_name, target_column, start_date, end_date, result_interval=TimeInterval.day,
+                        callback_url=None):
         """Create a new forecast for a datasource
 
         :param str datasource_name: the name of the data source to forecast on
@@ -50,7 +54,8 @@ class Sessions(object):
                                                     result_interval=result_interval, callback_url=callback_url)
         return SessionResponse(response, headers)
 
-    def create_forecast_with_metadata(self, datasource_name, column_metadata, start_date, end_date, result_interval=TimeInterval.day, callback_url=None):
+    def create_forecast_with_metadata(self, datasource_name, column_metadata, start_date, end_date,
+                                      result_interval=TimeInterval.day, callback_url=None):
         """Create a new forecast for a datasource
 
         :param str datasource_name: the name of the data source to forecast on
@@ -63,11 +68,14 @@ class Sessions(object):
         :return the session description
         :rtype: SessionResponse
         """
-        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date, result_interval=result_interval, column_metadata=column_metadata, callback_url=callback_url)
+        response, _, headers = self._create_session(datasource_name, 'forecast', start_date, end_date,
+                                                    result_interval=result_interval, column_metadata=column_metadata,
+                                                    callback_url=callback_url)
 
         return SessionResponse(response, headers)
 
-    def analyze_impact(self, datasource_name, target_column, event_name, start_date, end_date, result_interval=TimeInterval.day, callback_url=None):
+    def analyze_impact(self, datasource_name, target_column, event_name, start_date, end_date,
+                       result_interval=TimeInterval.day, callback_url=None):
         """Create a new impact analysis on a datasource
 
         :param str datasource_name: the name of the data source to forecast on
@@ -119,30 +127,45 @@ class Sessions(object):
                                                     event_name, result_interval)
         return SessionResponse(response, headers)
 
-    def train_model(self, datasource_name, target_column=None, column_metadata=None, prediction_domain='regression',callback_url=None):
+    def train_model(self, datasource_name, target_column=None, column_metadata=None, prediction_domain='regression',
+                    callback_url=None, extra_parameters=None):
         """Train a model for later predictions
 
-        :param str datasource_name: the name of the data source to forecast on
+        :param str datasource_name: the name of the data source for which to create the model
         :param str target_column: the column from the data source that will be requested in predictions
         :param object column_metadata: a dict of column name mapped to ColumnMetadata objects describing the columns used in the modeling process
-        :param string prediction_domain: a string indicating the desired model type: either 'regression' or 'classification'
+        :param string prediction_domain: a string indicating the desired model type: either 'regression', 'classification', or 'anomalies'
         :param str callback_url: the url to callback to on session status change events
+        :param extra_parameters: additional indicators to modify this model building session
 
         :return the session description
         :rtype: SessionResponse
         """
         response, _, headers = self._client.request_with_headers('POST', 'sessions/model',
-                                                 data={
-                                                     'predictionDomain': prediction_domain,
-                                                     'dataSourceName': datasource_name,
-                                                     'targetColumn': target_column,
-                                                     'columns': column_metadata,
-                                                     'callbackUrl': callback_url
-                                                 })
+                                                                 data={
+                                                                     'predictionDomain': prediction_domain,
+                                                                     'dataSourceName': datasource_name,
+                                                                     'targetColumn': target_column,
+                                                                     'columns': column_metadata,
+                                                                     'callbackUrl': callback_url,
+                                                                     'extraParameters': extra_parameters
+                                                                 })
 
         return SessionResponse(response, headers)
 
-    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None, session_type=None, page_number=0, page_size=50):
+    def train_anomalies_model(self, datasource_name, contains_anomalies=True, column_metadata=None):
+        """
+
+        :param datasource_name: str datasource_name: the name of the data source on which to train the anomaly model
+        :param contains_anomalies: does this data source contain the anomalies? Defaults to True.
+        :param column_metadata: modify column types and/or roles for this session
+        :return: the session description
+        """
+        return self.train_model(datasource_name=datasource_name, column_metadata=column_metadata,
+                                extra_parameters={'containsAnomalies': contains_anomalies})
+
+    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None,
+             session_type=None, page_number=0, page_size=50):
         """Get a list of all sessions, optionally filtering on session parameters
 
         :param str datasource_name: the name of the data source the session is related to
@@ -224,6 +247,36 @@ class Sessions(object):
 
         response = self._client.request('GET', 'sessions/%s/results/confusionmatrix' % session_id)
         return ConfusionMatrix(response)
+
+    def get_class_scores(self, session_id, page=0, pageSize=50):
+        """
+        Gets the class scores for each result of a particular completed classification model session
+        Note - will return 404 if not a completed classification model session
+        :param session_id: the completed classification model building session
+        :param page: page number, defaults to 0
+        :param pageSize: number of items per page, defaults to 50; 1000 max.
+        :return: ClassScores
+        """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
+        response = self._client.request('GET', 'sessions/%s/results/classScores' % session_id)
+        return ClassScores(response)
+
+    def get_anomaly_scores(self, session_id, page=0, pageSize=50):
+        """
+        Gets the scores of the entire dataset generated by a particular completed anomalies session
+        Note - will return 404 if not a completed anomalies model session
+        :param session_id: the completed anomalies model building session
+        :param page: page number, defaults to 0
+        :param pageSize: number of items per page, defaults to 50; 1000 max.
+        :return: AnomalyScores
+        """
+        if session_id is None:
+            raise ValueError('session_id is required and was not provided')
+
+        response = self._client.request('GET', 'sessions/%s/results/anomalyScores' % session_id)
+        return AnomalyScores(response)
 
     def get_contest(self, session_id):
         """
