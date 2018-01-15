@@ -41,19 +41,21 @@ class Models(object):
         response = self._client.request('GET', 'models/%s' % model_id)
         return ModelSummary(response)
 
-    def predict(self, model_id, features):
+    def predict(self, model_id, features, extra_parameters={}):
         """Predicts target values for a set of features using a model.
 
         :param str model_id: the id of the model to use for prediction
         :param list features: a list of dict objects with the features needed for prediction
-        :return:
+        :param extended capability for a particular model. includeClassScores=True for classifcation models to return scores.
+        :return: PredictResults
         """
         if model_id is None:
             raise ValueError('model_id is required and was not provided')
 
-        response = self._client.request('POST', 'models/%s/predict' % model_id, data={'data': features})
+        response = self._client.request('POST', 'models/%s/predict' % model_id, data={'data': features, 'extraParameters': extra_parameters})
 
         return PredictResults(response)
+
 
     def remove(self, model_id):
         """Remove a model by id

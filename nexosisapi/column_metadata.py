@@ -7,6 +7,7 @@ class ColumnType(Enum):
     numeric = 1
     logical = 2
     date = 3
+    text = 4
     numericMeasure = -1
 
 

@@ -22,3 +22,7 @@ class FakeHttpClient(object):
         self._uri = uri
         self._args = kwargs
         return self._return
+
+    def request_with_headers(self, verb, uri_path, **kwargs):
+        return self.request(verb=verb, uri=uri_path, **kwargs), None, {}
+
