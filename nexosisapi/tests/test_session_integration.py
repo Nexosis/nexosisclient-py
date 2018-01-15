@@ -43,13 +43,6 @@ class SessionIntegrationTests(unittest.TestCase):
         except ClientError:
             pass
 
-    def test_list_sessions(self):
-        results = self.test_client.sessions.list(self.ds_name)
-
-        name = set([s.datasource_name for s in results])
-
-        self.assertEqual(1, len(name))
-
     def test_list_is_paged(self):
         actual = self.test_client.sessions.list(page_number=1,page_size=10)
         self.assertEqual(1, actual.page_number)
