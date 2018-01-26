@@ -18,6 +18,6 @@ class VocabularyIntegationTests(unittest.TestCase):
     def test_list_vocabularies(self):
         vocabularies = self.test_client.vocabularies.list()
 
-        self.assertGreater(len(vocabularies), 0)
+        self.assertGreaterEqual(len(vocabularies), 0)
 
-    
+
