@@ -1,4 +1,5 @@
 from nexosisapi.data_source_type import DataSourceType
+import dateutil.parser
 
 class VocabularySummary(object):
     """Summary information about a Vocabulary"""
@@ -10,8 +11,8 @@ class VocabularySummary(object):
         self._id = data_dict.get('id', None)
         self._data_source_name = data_dict.get('dataSourceName', None)
         self._column_name = data_dict.get('columnName', None)
-        self._data_source_type = DataSourceType(data_dict.get('dataSourceName', 0))
-        self._created_on_date = data_dict.get('createdOnDate', None)
+        self._data_source_type = DataSourceType(data_dict.get('dataSourceType', 0))
+        self._created_on_date = dateutil.parser.parse(data_dict.get('createdOnDate', None))
         self._created_by_session_id = data_dict.get('createdBySessionId', None)
 
 
