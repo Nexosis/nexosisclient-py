@@ -1,4 +1,6 @@
 from nexosisapi.vocabulary_summary import VocabularySummary
+from nexosisapi.data_source_type import DataSourceType
+from nexosisapi.word import Word, WordType
 import unittest
 import dateutil.parser
 
@@ -18,8 +20,27 @@ class VocabularySummaryUnitTests(unittest.TestCase):
     def test_parses_column_name(self):
         self.assertEqual('my-column', self.summary.column_name)
 
+    def test_parses_data_source_type(self):
+        self.assertEqual(DataSourceType.view, self.summary.data_source_type)
+
     def test_parses_created_on_date(self):
         self.assertEqual(dateutil.parser.parse("2000-01-01"), self.summary.created_on_date)
 
     def test_parses_session_id(self):
         self.assertEqual('5678', self.summary.created_by_session_id)
+
+
+class VocabularyWordUnitTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.word = Word({'text': 'all work and no play make jack a dull boy', 'type': 1, 'rank': 1})
+
+
+    def test_parses_text(self):
+        self.assertEqual('all work and no play make jack a dull boy', self.word.text)
+
+    def test_parses_type(self):
+        self.assertEqual(WordType.stop_word, self.word.type)
+
+    def test_parses_rank(self):
+        self.assertEqual(1, self.word.rank)
