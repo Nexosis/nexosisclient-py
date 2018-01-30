@@ -9,7 +9,7 @@ class VocabularySummaryUnitTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.summary = VocabularySummary({'id': '123', 'dataSourceName': 'my-data-source', 'columnName': 'my-column', 'dataSourceType': "viewgit ", 'createdOnDate': '2000-01-01', 'createdBySessionId': '5678'})
+        cls.summary = VocabularySummary({'id': '123', 'dataSourceName': 'my-data-source', 'columnName': 'my-column', 'dataSourceType': "view", 'createdOnDate': '2000-01-01', 'createdBySessionId': '5678'})
 
 
     def test_parses_id(self):
