@@ -6,6 +6,7 @@ from .imports import Imports
 from .models import Models
 from .sessions import Sessions
 from .views import Views
+from .vocabularies import Vocabularies
 from .http_client import HttpClient
 
 from nexosisapi import NEXOSIS_API_KEY
@@ -28,6 +29,7 @@ class Client(object):
         self._imports = Imports(self._client)
         self._sessions = Sessions(self._client)
         self._views = Views(self._client)
+        self._vocabularies = Vocabularies(self._client)
 
     @property
     def datasets(self):
@@ -53,6 +55,11 @@ class Client(object):
     def views(self):
         """View based API operations"""
         return self._views
+
+    @property
+    def vocabularies(self):
+        """Vocabulary based API operations"""
+        return self._vocabularies
 
     def get_account_balance(self):
         """Gets the current account balance"""
