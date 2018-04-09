@@ -47,6 +47,7 @@ class Session(object):
         self._prediction_domain = data_dict.get('predictionDomain', 'none')
         md = data_dict.get('metadata') or {}
         self._column_metadata = {key: ColumnMetadata(value) for (key, value) in md.items()}
+        self._supports_feature_importance = data_dict.get('supportsFeatureImportance', False)
 
     @property
     def session_id(self):
@@ -112,6 +113,10 @@ class Session(object):
     def extra_parameters(self):
         return self._extra_parameters
 
+    @property
+    def supports_feature_importance(self):
+        return self._supports_feature_importance
+
     def __repr__(self):
         return """Session({
     'sessionId': '%s',
@@ -129,10 +134,11 @@ class Session(object):
     'availablePredictionIntervals': '%s',
     'extraParameters': %s,
     'links': %s
+    'supportsFeatureImportance': %s
 })""" % (self._session_id, self._type.name, self._status.name, self._status_history, self._datasource_name,
             self._target_column, self._model_id, self._start_date, self._end_date, self._result_interval.name,
             self._column_metadata, self._requested_date, self._available_prediction_intervals,
-            self._extra_parameters, self._links)
+            self._extra_parameters, self._links, self._supports_feature_importance)
 
 
 class SessionResponse(Session):

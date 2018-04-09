@@ -7,6 +7,7 @@ from nexosisapi.algorithm_contestant import AlgorithmContestant
 from nexosisapi.session_selection_metrics import SessionSelectionMetrics
 from nexosisapi.class_scores import ClassScores
 from nexosisapi.anomaly_scores import AnomalyScores
+from nexosisapi.feature_importance import FeatureImportance
 
 
 class Sessions(object):
@@ -330,3 +331,20 @@ class Sessions(object):
         response = self._client.request('GET',
                                         'sessions/{0}/contest/selection'.format(session_id))
         return SessionSelectionMetrics(response)
+
+    def get_feature_importance(self, session_id):
+        """
+
+        :param session_id: the unique id of the a completed session
+        :return: An object containing all of the scores by column
+        :rtype: FeatureImportance
+        .. note::
+            These feature importance scores will be available if your completed session
+            contains the property **supportsFeatureImportance** set to True
+        .. versionadded:: 2.2
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/results/featureimportance'.format(session_id))
+        return FeatureImportance(response)

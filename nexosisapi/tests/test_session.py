@@ -3,7 +3,7 @@ from nexosisapi.tests.fake_http_client import FakeHttpClient
 from nexosisapi import Client
 from nexosisapi.class_scores import ClassScores
 from nexosisapi.anomaly_scores import AnomalyScores
-
+from nexosisapi.feature_importance import FeatureImportance
 
 class TestSession(unittest.TestCase):
 
@@ -52,6 +52,21 @@ class TestSession(unittest.TestCase):
         self.assertEqual(actual.data[0]['anomaly'], -0.245645)
         self.assertEqual(actual.metrics['percentAnomalies'], 0.10119047619047619)
 
+    def test_can_build_importance_scores(self):
+        session = self.session_data
+        session.update({
+             'featureImportance' : {
+                "col1": 0.91805331325755257,
+                "col2": 1,
+                "col3": 0.21478609588442729,
+                "col4:0": 0.0526418163207683,
+                "col4:1": 0.10938777105141982,
+             }
+            })
+        actual = FeatureImportance(session)
+        self.assertEqual(len(actual.scores), 5)
+        self.assertEqual(actual.scores['col3'], 0.21478609588442729)
+
     def test_anomalies_includes_extra_parms(self):
         self.client.sessions.train_anomalies_model('test')
         self.assertEqual(self.http.args['data']['extraParameters']['containsAnomalies'], True)
@@ -64,6 +79,10 @@ class TestSession(unittest.TestCase):
         self.client.sessions.get_anomaly_scores('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
         self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/anomalyScores')
 
+    def test_feature_importance_uses_correct_url(self):
+        self.client.sessions.get_feature_importance('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
+        self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/featureimportance')
+
     @classmethod
     def setUpClass(cls):
         cls.session_data = {
@@ -71,6 +90,7 @@ class TestSession(unittest.TestCase):
             'type': 'forecast',
             'status': 'completed',
             'predictionDomain': 'forecast',
+            'supportsFeatureImportance': True,
             'availablePredictionIntervals': ['0.5'],
             'startDate': '2017-09-01T00:00:00+00:00',
             'endDate': '2017-09-30T00:00:00+00:00',
