@@ -8,7 +8,7 @@ from nexosisapi.session_selection_metrics import SessionSelectionMetrics
 from nexosisapi.class_scores import ClassScores
 from nexosisapi.anomaly_scores import AnomalyScores
 from nexosisapi.feature_importance import FeatureImportance
-
+from nexosisapi.timeseries_outliers import TimeseriesOutliers
 
 class Sessions(object):
     """Session based API operations"""
@@ -348,3 +348,17 @@ class Sessions(object):
         response = self._client.request('GET',
                                         'sessions/{0}/results/featureimportance'.format(session_id))
         return FeatureImportance(response)
+
+    def get_timeseries_outliers(self, session_id):
+        """
+
+        :param session_id: the unique id of the a completed timeseries session
+        :return: An object containing all of the outliers and their smoothed values
+        :rtype: TimeseriesOutliers
+        .. versionadded:: 2.2
+        """
+        if session_id is None or not session_id:
+            raise ValueError('session_id is required and was not provided')
+        response = self._client.request('GET',
+                                        'sessions/{0}/results/outliers'.format(session_id))
+        return TimeseriesOutliers(response)

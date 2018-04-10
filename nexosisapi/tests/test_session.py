@@ -1,9 +1,12 @@
 import unittest
+import datetime
 from nexosisapi.tests.fake_http_client import FakeHttpClient
 from nexosisapi import Client
 from nexosisapi.class_scores import ClassScores
 from nexosisapi.anomaly_scores import AnomalyScores
 from nexosisapi.feature_importance import FeatureImportance
+from nexosisapi.outlier import Outlier
+from nexosisapi.timeseries_outliers import TimeseriesOutliers
 
 class TestSession(unittest.TestCase):
 
@@ -82,6 +85,41 @@ class TestSession(unittest.TestCase):
     def test_feature_importance_uses_correct_url(self):
         self.client.sessions.get_feature_importance('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
         self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/featureimportance')
+
+    def test_timeseries_outliers_uses_correct_url(self):
+        self.client.sessions.get_timeseries_outliers('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
+        self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/outliers')
+
+    def test_outlier_parses_keys(self):
+        target = Outlier({'timeStamp': datetime.datetime.now, 'sales:actual': 25.65, 'sales:smooth': 300.00})
+        self.assertEqual(target.smooth, 300.00)
+
+    def test_outlier_parses_string_values(self):
+        target = Outlier({'timeStamp': datetime.datetime.now, 'sales:actual': '25.65', 'sales:smooth': '300.00'})
+        self.assertEqual(target.actual, 25.65)
+
+    def test_outlier_safe_if_missing_value(self):
+        target = Outlier({'timeStamp': datetime.datetime.now})
+        self.assertIsNone(target.actual)
+
+    def test_outliers_from_data(self):
+        session = self.session_data
+        session.update({
+            'data': [
+            {
+                'timeStamp': '1/5/2014 12:00:00 AM',
+                'sales:actual': 229.09,
+                'sales:smooth': 1743.42167102697
+            },
+            {
+                'timeStamp': '1/6/2014 12:00:00 AM',
+                'sales:actual': 0,
+                'sales:smooth': 1920.29538270229
+            }
+        ]})
+        target = TimeseriesOutliers(session)
+        self.assertEqual(len(target.data), 2)
+        self.assertEqual(target.data[0].actual, 229.09)
 
     @classmethod
     def setUpClass(cls):
