@@ -5,7 +5,7 @@ import sys
 
 from nexosisapi import Client, ClientError
 from nexosisapi.status import Status
-
+from nexosisapi.list_queries import SessionListQuery
 
 class ContestIntegrationTests(unittest.TestCase):
     @classmethod
@@ -14,7 +14,7 @@ class ContestIntegrationTests(unittest.TestCase):
         cls.test_client = Client(key=os.environ['NEXOSIS_PAID_API_TESTKEY'],
                                  uri=os.environ['NEXOSIS_API_TESTURI'])
         try:
-            current_sessions = cls.test_client.sessions.list('', page_size=100)
+            current_sessions = cls.test_client.sessions.list(SessionListQuery(page_size=100))
             cls.completed_session = next((s for s in current_sessions if s.status == Status.completed), None)
         except(ClientError):
             # HACK: having issues with different key

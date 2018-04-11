@@ -11,7 +11,7 @@ from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.session import SessionType
 from nexosisapi.status import Status
 from nexosisapi.tests import build_test_dataset
-
+from nexosisapi.list_queries import SessionListQuery
 
 class SessionIntegrationTests(unittest.TestCase):
 
@@ -44,7 +44,7 @@ class SessionIntegrationTests(unittest.TestCase):
             pass
 
     def test_list_is_paged(self):
-        actual = self.test_client.sessions.list(page_number=1,page_size=10)
+        actual = self.test_client.sessions.list(SessionListQuery(page_number=1,page_size=10))
         self.assertEqual(1, actual.page_number)
         self.assertEqual(10, actual.page_size)
 
@@ -131,7 +131,7 @@ class SessionIntegrationTests(unittest.TestCase):
     @classmethod
     def _setup_sessions(cls):
         # check if we have a session data for forecast and impact, and if not, kick them off
-        current_sessions = cls.test_client.sessions.list('', page_size=100)
+        current_sessions = cls.test_client.sessions.list(SessionListQuery(page_size=100))
 
         cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
         cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)

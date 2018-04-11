@@ -34,7 +34,7 @@ class DatasetsIntegrationTests(unittest.TestCase):
         result = self.test_client.datasets.create(create_name, self.data)
 
         self.assertEqual(create_name, result.name)
-        self.assertEqual(ColumnType.numeric, result.column_metadata['observed'].data_type)
+        self.assertEqual(ColumnType.numericMeasure, result.column_metadata['observed'].data_type)
         self.assertEqual(Role.target, result.column_metadata['observed'].role)
         self.assertEqual(ColumnType.date, result.column_metadata['timestamp'].data_type)
         self.assertEqual(Role.timestamp, result.column_metadata['timestamp'].role)
