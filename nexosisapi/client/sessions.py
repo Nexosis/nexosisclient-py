@@ -344,7 +344,7 @@ class Sessions(object):
         """
 
         :param session_id: the unique id of the a completed session
-         :param page_number: page number, defaults to 0
+        :param page_number: page number, defaults to 0
         :param page_size: number of items per page, defaults to 50; 1000 max.
         :return: An object containing all of the scores by column
         :rtype: FeatureImportance
@@ -366,7 +366,7 @@ class Sessions(object):
         """
 
         :param session_id: the unique id of the a completed timeseries session
-         :param page_number: page number, defaults to 0
+        :param page_number: page number, defaults to 0
         :param page_size: number of items per page, defaults to 50; 1000 max.
         :return: An object containing all of the outliers and their smoothed values
         :rtype: TimeseriesOutliers
@@ -385,7 +385,7 @@ class Sessions(object):
         """
 
         :param session_id: the unique id of the a completed timeseries session
-         :param page_number: page number, defaults to 0
+        :param page_number: page number, defaults to 0
         :param page_size: number of items per page, defaults to 50; 1000 max.
         :return: An object containing all of distances and anomalies
         :rtype: AnomalyDistances
