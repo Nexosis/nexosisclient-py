@@ -12,6 +12,7 @@ from nexosisapi.session import SessionType
 from nexosisapi.status import Status
 from nexosisapi.tests import build_test_dataset
 from nexosisapi.list_queries import SessionListQuery
+from nexosisapi.timeseries_outliers import TimeseriesOutliers
 
 class SessionIntegrationTests(unittest.TestCase):
 
@@ -127,6 +128,11 @@ class SessionIntegrationTests(unittest.TestCase):
         self.assertIsNotNone(actual)
         self.assertIsInstance(actual, ConfusionMatrix)
         self.assertGreater(len(actual.values), 0)
+
+    def test_get_outliers(self):
+        actual = self.test_client.sessions.get_timeseries_outliers(self.forecast.session_id)
+        self.assertIsNotNone(actual)
+        self.assertIsInstance(actual, TimeseriesOutliers)
 
     @classmethod
     def _setup_sessions(cls):
