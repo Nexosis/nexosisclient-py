@@ -7,6 +7,8 @@ from nexosisapi.anomaly_scores import AnomalyScores
 from nexosisapi.feature_importance import FeatureImportance
 from nexosisapi.outlier import Outlier
 from nexosisapi.timeseries_outliers import TimeseriesOutliers
+from nexosisapi.distance_metric import DistanceMetric
+from nexosisapi.anomaly_distances import AnomalyDistances
 
 class TestSession(unittest.TestCase):
 
@@ -90,6 +92,10 @@ class TestSession(unittest.TestCase):
         self.client.sessions.get_timeseries_outliers('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
         self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/outliers')
 
+    def test_timeseries_outliers_uses_correct_url(self):
+        self.client.sessions.get_distance_metrics('f8d11e26-79f0-43b4-9545-111b8eaa00a5')
+        self.assertEqual(self.http.uri, 'sessions/f8d11e26-79f0-43b4-9545-111b8eaa00a5/results/mahalanobisdistances')
+
     def test_outlier_parses_keys(self):
         target = Outlier({'timeStamp': datetime.datetime.now, 'sales:actual': 25.65, 'sales:smooth': 300.00})
         self.assertEqual(target.smooth, 300.00)
@@ -120,6 +126,44 @@ class TestSession(unittest.TestCase):
         target = TimeseriesOutliers(session)
         self.assertEqual(len(target.data), 2)
         self.assertEqual(target.data[0].actual, 229.09)
+
+    def test_distance_from_data(self):
+        data = {'anomaly': 0.0487072268545709, 'col1': 85.7984, 'col2': 0.93, 'mahalanobis_distance': 143.312589889491}
+        actual = DistanceMetric(data)
+        self.assertEqual(actual.anomaly_score, 0.0487072268545709)
+        self.assertTrue('col1' in actual.data.keys())
+        self.assertFalse('anomaly' in actual.data.keys())
+
+    def test_anomaly_distances_adds_all_data(self):
+        session = self.session_data
+        session.update({
+            'data': [
+                {
+                    'anomaly': '0.0487072268545709',
+                    'Ash': '2',
+                    'Hue': '0.93',
+                    'Alcohol': '12',
+                    'ODRatio': '3.05',
+                    'mahalanobis_distance': '143.312589889491'
+                },
+                {
+                    'anomaly': '0.000317797613019206',
+                    'Ash': '2.28',
+                    'Hue': '1.25',
+                    'Alcohol': '12.33',
+                    'ODRatio': '1.67',
+                    'mahalanobis_distance': '156.112291933161'
+                }
+            ],
+            'pageNumber': 0,
+            'totalPages': 4,
+            'pageSize': 50,
+            'totalCount': 178,
+        })
+        actual = AnomalyDistances(session)
+        self.assertEqual(len(actual.data), 2)
+        self.assertEqual(actual.data.page_number, 0)
+        self.assertEqual(actual.data.page_size, 50)
 
     @classmethod
     def setUpClass(cls):
