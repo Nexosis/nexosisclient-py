@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from nexosisapi.list_queries import *
-
+from dateutil import parser
 
 class TestListQueries(unittest.TestCase):
     def test_dataset_query_uses_name(self):
@@ -16,7 +16,7 @@ class TestListQueries(unittest.TestCase):
         self.assertTrue(type(actual) is str)
 
     def test_session_query_formats_with_tz(self):
-        target = SessionListQuery(options={'requested_after_date': datetime.datetime.strptime('2018-04-11T20:18:05+0300','%Y-%m-%dT%H:%M:%S%z')})
+        target = SessionListQuery(options={'requested_after_date': parse('2018-04-11T20:18:05+0300')})
         actual = target.query_parameters()['requestedAfterDate']
         self.assertEqual(actual,'2018-04-11T20:18:05+0300')
 
