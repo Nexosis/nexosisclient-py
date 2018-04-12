@@ -55,10 +55,9 @@ class ListQuery(object):
             query.update({'page': self.page_number})
         if self.page_size is not None:
             query.update({'pageSize': self.page_size})
-        if self.sort_order is not None:
-            query.update({'sortOrder': self.sort_order.name})
         if self._sort_by is not None:
             query.update({'sortBy': self._sort_by})
+            query.update({'sortOrder': self.sort_order.name})
         return query
 
     @staticmethod

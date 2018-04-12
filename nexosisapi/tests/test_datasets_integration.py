@@ -7,7 +7,7 @@ import csv
 
 from nexosisapi import Client, ClientError
 from nexosisapi.column_metadata import ColumnMetadata, ColumnType, Role, Imputation, Aggregation
-
+from nexosisapi.list_queries import DatasetListQuery
 
 class DatasetsIntegrationTests(unittest.TestCase):
     @classmethod
@@ -31,14 +31,16 @@ class DatasetsIntegrationTests(unittest.TestCase):
 
     def test_create(self):
         create_name = self.ds_name + "create_test"
-        result = self.test_client.datasets.create(create_name, self.data)
+        try:
+            result = self.test_client.datasets.create(create_name, self.data)
 
-        self.assertEqual(create_name, result.name)
-        self.assertEqual(ColumnType.numericMeasure, result.column_metadata['observed'].data_type)
-        self.assertEqual(Role.target, result.column_metadata['observed'].role)
-        self.assertEqual(ColumnType.date, result.column_metadata['timestamp'].data_type)
-        self.assertEqual(Role.timestamp, result.column_metadata['timestamp'].role)
-        self.test_client.datasets.remove(create_name)
+            self.assertEqual(create_name, result.name)
+            self.assertEqual(ColumnType.numericMeasure, result.column_metadata['observed'].data_type)
+            self.assertEqual(Role.target, result.column_metadata['observed'].role)
+            self.assertEqual(ColumnType.date, result.column_metadata['timestamp'].data_type)
+            self.assertEqual(Role.timestamp, result.column_metadata['timestamp'].role)
+        finally:
+            self.test_client.datasets.remove(create_name)
 
     def test_create_with_measure_type(self):
         metadata = {'observed': ColumnMetadata({'dataType': 'numericMeasure', 'role': 'target'}),
@@ -89,17 +91,17 @@ class DatasetsIntegrationTests(unittest.TestCase):
         self.assertEqual(len(self.data), len(check.data))
 
     def test_list_datasets(self):
-        ds_list = self.test_client.datasets.list('', 0, 100)
+        ds_list = self.test_client.datasets.list(DatasetListQuery(page_size=100))
 
         self.assertIn(self.ds_name, map(lambda x: x.name, ds_list))
 
     def test_list_is_paged(self):
-        actual = self.test_client.datasets.list(page_number=1, page_size=10)
+        actual = self.test_client.datasets.list(DatasetListQuery(page_number=1, page_size=10))
         self.assertEqual(1, actual.page_number)
         self.assertEqual(10, actual.page_size)
 
     def test_list_with_filtering(self):
-        ds_list = self.test_client.datasets.list(self.ds_name[:10], 0, 100)
+        ds_list = self.test_client.datasets.list(DatasetListQuery(partial_name=self.ds_name[:10], page_size=100))
 
         self.assertIn(self.ds_name, [x.name for x in ds_list])
 

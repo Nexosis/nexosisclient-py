@@ -1,11 +1,8 @@
 import time
 import os
-
 import dateutil.parser
 import unittest
-
 from nexosisapi.column_metadata import ColumnMetadata
-
 from nexosisapi import Client, ClientError
 from nexosisapi.confusion_matrix import ConfusionMatrix
 from nexosisapi.session import SessionType
@@ -13,6 +10,8 @@ from nexosisapi.status import Status
 from nexosisapi.tests import build_test_dataset
 from nexosisapi.list_queries import SessionListQuery
 from nexosisapi.timeseries_outliers import TimeseriesOutliers
+from nexosisapi.list_queries import DatasetListQuery
+
 
 class SessionIntegrationTests(unittest.TestCase):
 
@@ -36,7 +35,7 @@ class SessionIntegrationTests(unittest.TestCase):
             cls.test_client.datasets.remove(cls.ds_name, cascade="session")
             cls.test_client.datasets.remove(cls.regression_ds_name, cascade="session")
             cls.test_client.datasets.remove(cls.classification_ds_name, cascade="session")
-            dataset_list = cls.test_client.datasets.list('test-session-integration')
+            dataset_list = cls.test_client.datasets.list(DatasetListQuery(partial_name='test-session-integration'))
 
             for dataset in dataset_list:
                 cls.test_client.datasets.remove(dataset.name, cascade="session")
@@ -45,7 +44,7 @@ class SessionIntegrationTests(unittest.TestCase):
             pass
 
     def test_list_is_paged(self):
-        actual = self.test_client.sessions.list(SessionListQuery(page_number=1,page_size=10))
+        actual = self.test_client.sessions.list(SessionListQuery(page_number=1, page_size=10))
         self.assertEqual(1, actual.page_number)
         self.assertEqual(10, actual.page_size)
 
@@ -57,19 +56,21 @@ class SessionIntegrationTests(unittest.TestCase):
 
         self.assertIsNotNone(forecast)
         self.assertEqual(SessionType.forecast, forecast.type)
-
+        self.test_client.datasets.remove('test-session-integration-forecast', cascade='session')
 
     def test_create_impact(self):
         self.test_client.datasets.create('test-session-integration-impact', self.data)
-        impact = self.test_client.sessions.analyze_impact('test-session-integration-impact', 'observed',
-                                                          'create-impact-test',
-                                                          dateutil.parser.parse('2008-08-01'),
-                                                          dateutil.parser.parse('2008-08-31'))
+        try:
+            impact = self.test_client.sessions.analyze_impact('test-session-integration-impact', 'observed',
+                                                              'create-impact-test',
+                                                              dateutil.parser.parse('2008-08-01'),
+                                                              dateutil.parser.parse('2008-08-31'))
 
-        self.assertIsNotNone(impact)
+            self.assertIsNotNone(impact)
 
-        self.assertEqual(SessionType.impact, impact.type)
-
+            self.assertEqual(SessionType.impact, impact.type)
+        finally:
+            self.test_client.datasets.remove('test-session-integration-impact', cascade='session')
 
     def test_get_results(self):
         results = self.test_client.sessions.get_results(self.forecast.session_id)
@@ -109,9 +110,12 @@ class SessionIntegrationTests(unittest.TestCase):
 
     def test_create_regression_model(self):
         columns = {
-            'R.D.Spend': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
-            'Administration': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
-            'Marketing.Spend': ColumnMetadata({'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'R.D.Spend': ColumnMetadata(
+                {'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'Administration': ColumnMetadata(
+                {'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
+            'Marketing.Spend': ColumnMetadata(
+                {'dataType': 'numeric', 'role': 'feature', 'imputation': 'mode', 'aggregation': 'median'}),
             'Profit': ColumnMetadata({'dataType': 'numeric', 'role': 'target'}),
             'ny': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
             'florida': ColumnMetadata({'dataType': 'logical', 'role': 'feature'}),
@@ -120,8 +124,9 @@ class SessionIntegrationTests(unittest.TestCase):
         results = self.test_client.sessions.train_model(self.regression_ds_name, 'profit', columns)
 
     def test_create_classification_model(self):
-        result = self.test_client.sessions.train_model(self.classification_ds_name,'iris',prediction_domain='classification')
-        self.assertEqual(result.prediction_domain.lower(),'classification')
+        result = self.test_client.sessions.train_model(self.classification_ds_name, 'iris',
+                                                       prediction_domain='classification')
+        self.assertEqual(result.prediction_domain.lower(), 'classification')
 
     def test_get_confusion_matrix(self):
         actual = self.test_client.sessions.get_confusion_matrix(self.classification.session_id)
@@ -139,22 +144,27 @@ class SessionIntegrationTests(unittest.TestCase):
         # check if we have a session data for forecast and impact, and if not, kick them off
         current_sessions = cls.test_client.sessions.list(SessionListQuery(page_size=100))
 
-        cls.forecast = next((s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
-        cls.impact = next((s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
-        cls.classification = next((s for s in current_sessions if s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed), None)
+        cls.forecast = next(
+            (s for s in current_sessions if s.type == SessionType.forecast and s.status == Status.completed), None)
+        cls.impact = next(
+            (s for s in current_sessions if s.type == SessionType.impact and s.status == Status.completed), None)
+        cls.classification = next((s for s in current_sessions if
+                                   s.type == SessionType.model and s.prediction_domain.lower() == 'classification' and s.status == Status.completed),
+                                  None)
 
         if cls.forecast is None:
             cls.forecast = cls.test_client.sessions.create_forecast(cls.ds_name, 'observed',
-                                                                      dateutil.parser.parse('2008-09-01'),
-                                                                      dateutil.parser.parse('2008-09-30'))
+                                                                    dateutil.parser.parse('2008-09-01'),
+                                                                    dateutil.parser.parse('2008-09-30'))
         if cls.impact is None:
             cls.impact = cls.test_client.sessions.analyze_impact(cls.ds_name, 'observed',
-                                                                   'integration-test-analysis',
-                                                                   dateutil.parser.parse('2008-08-01'),
-                                                                   dateutil.parser.parse('2008-08-31'))
+                                                                 'integration-test-analysis',
+                                                                 dateutil.parser.parse('2008-08-01'),
+                                                                 dateutil.parser.parse('2008-08-31'))
 
         if cls.classification is None:
-            cls.classification = cls.test_client.sessions.train_model(cls.classification_ds_name, 'iris', prediction_domain='classification')
+            cls.classification = cls.test_client.sessions.train_model(cls.classification_ds_name, 'iris',
+                                                                      prediction_domain='classification')
 
         counter = 0
         while cls.impact.status != Status.completed or cls.forecast.status != Status.completed or cls.classification.status != Status.completed:
