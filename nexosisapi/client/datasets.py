@@ -42,7 +42,7 @@ class Datasets(object):
 
         return DatasetSummary(response)
 
-    def list(self, dataset_list_query: DatasetListQuery=DatasetListQuery()):
+    def list(self, dataset_list_query=DatasetListQuery()):
         """Get the list of saved datasets, optionally filtering by name
 
         :param DatasetListQuery dataset_list_query: query options to limit results of the request

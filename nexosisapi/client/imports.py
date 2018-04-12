@@ -6,7 +6,7 @@ class Imports(object):
     def __init__(self, client):
         self._client = client
 
-    def list(self, import_list_query: ImportListQuery=ImportListQuery()) -> PagedList:
+    def list(self, import_list_query=ImportListQuery()):
         response = self._client.request('GET', '/imports', params=import_list_query.query_parameters())
         return PagedList.from_response(
             [ImportResponse(r) for r in response.get('items', [])],

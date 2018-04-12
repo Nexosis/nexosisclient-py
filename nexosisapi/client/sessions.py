@@ -168,7 +168,7 @@ class Sessions(object):
         return self.train_model(datasource_name=datasource_name, column_metadata=column_metadata,
                                 extra_parameters={'containsAnomalies': contains_anomalies})
 
-    def list(self, session_list_query: SessionListQuery):
+    def list(self, session_list_query=SessionListQuery()):
         """Get a list of all sessions, optionally filtering on session parameters
         :param SessionListQuery session_list_query: query options to limit the results of the request
         :returns a list of `SessionResponse`

@@ -8,7 +8,7 @@ class Models(object):
     def __init__(self, client):
         self._client = client
 
-    def list(self, model_list_query: ModelListQuery=ModelListQuery()) -> PagedList:
+    def list(self, model_list_query=ModelListQuery()):
         """Get a list of all models, optionally filtered on model properties
 
         :param ModelListQuery model_list_query: options to limit the results of the request

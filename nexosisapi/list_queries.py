@@ -158,7 +158,7 @@ class SessionListQuery(ListQuery):
         return self._requested_after_date
 
     @requested_after_date.setter
-    def requested_after_date(self, value: datetime):
+    def requested_after_date(self, value):
         self._requested_after_date = value
 
     @property
@@ -166,7 +166,7 @@ class SessionListQuery(ListQuery):
         return self._requested_before_date
 
     @requested_before_date.setter
-    def requested_before_date(self, value: datetime):
+    def requested_before_date(self, value):
         self._requested_before_date = value
 
     @property
