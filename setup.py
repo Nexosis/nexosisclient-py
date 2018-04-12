@@ -7,7 +7,7 @@ with open('README.md') as f:
 build_number = os.getenv('TRAVIS_BUILD_NUMBER', '1')
 
 setup(name='nexosisapi',
-      version='2.1.' + build_number,
+      version='2.2.' + build_number,
       description='Python Client for the Nexosis API',
       long_description='This software is provided as a way to include Nexosis API functionality in your own Python '
                        'software. You can read about the Nexosis API at https://developers.nexosis.com',
