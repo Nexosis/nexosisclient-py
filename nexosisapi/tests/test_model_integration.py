@@ -7,7 +7,7 @@ import csv
 
 from nexosisapi import Client, ClientError
 from nexosisapi.tests import build_test_dataset
-
+from nexosisapi.list_queries import ModelListQuery
 
 class ModelIntegrationTests(unittest.TestCase):
     regression_ds_name = 'model_tests_data'
@@ -40,11 +40,11 @@ class ModelIntegrationTests(unittest.TestCase):
             return
 
     def test_list_models(self):
-        models = self.test_client.models.list(datasource_name=self.test_model.datasource_name)
+        models = self.test_client.models.list(ModelListQuery(options={'datasource_name': self.test_model.datasource_name}))
         self.assertGreater(len(models), 0)
 
     def test_list_is_paged(self):
-        actual = self.test_client.models.list(page_number=1, page_size=10)
+        actual = self.test_client.models.list(ModelListQuery(page_number=1, page_size=10))
         self.assertEqual(1, actual.page_number)
         self.assertEqual(10, actual.page_size)
 

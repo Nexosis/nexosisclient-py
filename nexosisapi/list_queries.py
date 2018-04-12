@@ -202,7 +202,7 @@ class ModelListQuery(ListQuery):
         super(ModelListQuery, self).__init__(page_number, page_size, sort_order, sort_by)
         self._datasource_name = options.get('datasource_name')
         self._created_after_date = ListQuery.__convert_date_field__(options.get('created_after_date'))
-        self._created_before_date = ListQuery.__convert_date_field__(options.get('created_after_date'))
+        self._created_before_date = ListQuery.__convert_date_field__(options.get('created_before_date'))
 
     @property
     def datasource_name(self):
@@ -213,12 +213,12 @@ class ModelListQuery(ListQuery):
         self._datasource_name = value
 
     @property
-    def created_before_date(self):
-        return self._created_before_date
+    def created_after_date(self):
+        return self._created_after_date
 
-    @created_before_date.setter
-    def created_before_date(self, value):
-        self._created_before_date = value
+    @created_after_date.setter
+    def created_after_date(self, value):
+        self._created_after_date = value
 
     @property
     def created_before_date(self):
