@@ -7,10 +7,11 @@ from nexosisapi.algorithm_contestant import AlgorithmContestant
 from nexosisapi.session_selection_metrics import SessionSelectionMetrics
 from nexosisapi.class_scores import ClassScores
 from nexosisapi.anomaly_scores import AnomalyScores
+
+from nexosisapi.list_queries import SessionListQuery
 from nexosisapi.feature_importance import FeatureImportance
 from nexosisapi.timeseries_outliers import TimeseriesOutliers
 from nexosisapi.anomaly_distances import AnomalyDistances
-
 
 class Sessions(object):
     """Session based API operations"""
@@ -167,31 +168,13 @@ class Sessions(object):
         return self.train_model(datasource_name=datasource_name, column_metadata=column_metadata,
                                 extra_parameters={'containsAnomalies': contains_anomalies})
 
-    def list(self, datasource_name=None, event_name=None, requested_after=None, requested_before=None,
-             session_type=None, page_number=0, page_size=50):
+    def list(self, session_list_query=SessionListQuery()):
         """Get a list of all sessions, optionally filtering on session parameters
-
-        :param str datasource_name: the name of the data source the session is related to
-        :param str event_name: filter on the event name given when running an impact analysis
-        :param datetime requested_before: only include sessions requested before this date
-        :param datetime requested_after: only include sessions requested after this date
-        :param SessionType session_type: filter on the type of session
-        :param int page_number: zero-based page number of results to retrieve
-        :param int page_size: count of results to retrieve in each page (default 50, max 1000).
-
+        :param SessionListQuery session_list_query: query options to limit the results of the request
         :returns a list of `SessionResponse`
         :rtype list
         """
-        query = {
-            'page': page_number,
-            'pageSize': page_size,
-            'dataSourceName': datasource_name,
-            'eventName': event_name,
-            'requestedBefore': requested_before,
-            'requestedAfter': requested_after,
-            'sessionType': session_type
-        }
-        response, _, headers = self._client.request_with_headers('GET', 'sessions', params=query)
+        response, _, headers = self._client.request_with_headers('GET', 'sessions', params=session_list_query.query_parameters())
         return PagedList.from_response(
             [SessionResponse(item, headers) for item in response.get('items', [])],
             response)

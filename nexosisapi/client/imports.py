@@ -1,16 +1,13 @@
 from nexosisapi.import_response import ImportResponse
 from nexosisapi.paged_list import PagedList
-
+from nexosisapi.list_queries import ImportListQuery
 
 class Imports(object):
     def __init__(self, client):
         self._client = client
 
-    def list(self, page_number=0, page_size=50):
-        query = {
-            'page': page_number,
-            'pageSize': page_size}
-        response = self._client.request('GET', '/imports', params=query)
+    def list(self, import_list_query=ImportListQuery()):
+        response = self._client.request('GET', '/imports', params=import_list_query.query_parameters())
         return PagedList.from_response(
             [ImportResponse(r) for r in response.get('items', [])],
             response)

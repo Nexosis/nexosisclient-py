@@ -1,6 +1,6 @@
 from nexosisapi.model_summary import ModelSummary, PredictResults
 from nexosisapi.paged_list import PagedList
-
+from nexosisapi.list_queries import ModelListQuery
 
 class Models(object):
     """Model based API operations"""
@@ -8,23 +8,13 @@ class Models(object):
     def __init__(self, client):
         self._client = client
 
-    def list(self, page_number=0, page_size=50, datasource_name=None, created_after=None, created_before=None):
+    def list(self, model_list_query=ModelListQuery()):
         """Get a list of all models, optionally filtered on model properties
 
-        :param int page_number: zero-based page number of results to retrieve
-        :param int page_size: count of results to retrieve in each page (default 50, max 1000).
-        :param str datasource_name: the name of the data source the model is related to
-        :param datetime created_after: only include sessions requested before this date
-        :param datetime created_before: only include sessions requested after this date
+        :param ModelListQuery model_list_query: options to limit the results of the request
+        :return: PagedList of ModelSummary
         """
-        query = {
-            'page': page_number,
-            'pageSize': page_size,
-            'dataSourceName': datasource_name,
-            'createdBefore': created_before,
-            'createdAfter': created_after,
-        }
-        response = self._client.request('GET', 'models', params=query)
+        response = self._client.request('GET', 'models', params=model_list_query.query_parameters())
         return PagedList.from_response(
             [ModelSummary(model) for model in response.get('items', [])],
             response)

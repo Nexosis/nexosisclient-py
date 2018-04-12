@@ -1,6 +1,7 @@
 import unittest
 from nexosisapi.tests.fake_http_client import FakeHttpClient
 from nexosisapi import Client
+from nexosisapi.list_queries import ModelListQuery
 
 
 class ModelOperationTests(unittest.TestCase):
@@ -28,7 +29,10 @@ class ModelOperationTests(unittest.TestCase):
         self.assertEqual(self.http.uri, 'models/some-model-id')
 
     def test_list_formats_arguments(self):
-        self.client.models.list(page_number=0, page_size=10, datasource_name='some-datasource', created_before='2017-01-01', created_after='2017-10-10')
+        self.client.models.list(ModelListQuery(page_number=0, page_size=10,
+                                               options={'datasource_name': 'some-datasource',
+                                                        'created_before_date': '2017-01-01',
+                                                        'created_after_date': '2017-10-10'}))
 
         self.assertEqual(self.http.verb, 'GET')
         self.assertEqual(self.http.uri, 'models')
@@ -36,5 +40,5 @@ class ModelOperationTests(unittest.TestCase):
         self.assertEqual(params['page'], 0)
         self.assertEqual(params['pageSize'], 10)
         self.assertEqual(params['dataSourceName'], 'some-datasource')
-        self.assertEqual(params['createdBefore'], '2017-01-01')
-        self.assertEqual(params['createdAfter'], '2017-10-10')
+        self.assertEqual(params['createdBeforeDate'], '2017-01-01T00:00:00')
+        self.assertEqual(params['createdAfterDate'], '2017-10-10T00:00:00')

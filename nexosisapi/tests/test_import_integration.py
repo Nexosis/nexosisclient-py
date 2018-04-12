@@ -5,7 +5,7 @@ import time
 from nexosisapi import Client, ClientError
 from nexosisapi.column_metadata import ColumnMetadata
 from nexosisapi.status import Status
-
+from nexosisapi.list_queries import ImportListQuery
 
 class ImportIntegrationTests(unittest.TestCase):
     @classmethod
@@ -44,6 +44,6 @@ class ImportIntegrationTests(unittest.TestCase):
         self.assertGreater(len(import_list), 0)
 
     def test_list_is_paged(self):
-        actual = self.test_client.imports.list(page_number=1, page_size=10)
+        actual = self.test_client.imports.list(ImportListQuery(page_number=1, page_size=10))
         self.assertEqual(1, actual.page_number)
         self.assertEqual(10, actual.page_size)
